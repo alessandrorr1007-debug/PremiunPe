@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #09090b;
+    color: #f4f4f5;
+    overflow-x: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-sora {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Custom Slim Scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(244, 244, 245, 0.15);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #f4f4f5;
+  }
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .admin-surface {
+    background-color: #121216;
+    border: 1px solid rgba(244, 244, 245, 0.1);
+  }
+
+  .admin-card {
+    background-color: #121216;
+    border: 1px solid rgba(244, 244, 245, 0.1);
+    border-radius: 20px;
+  }
+
+  .admin-button-primary {
+    background-color: #f4f4f5;
+    color: #09090b;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 700;
+    transition: all 0.18s ease-in-out;
+  }
+
+  .admin-button-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+
+  .admin-button-primary:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+  }
+
+  .specular-shine {
+    background: linear-gradient(105deg, transparent 20%, rgba(244, 244, 245, 0.18) 50%, transparent 80%);
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Executive surfaces and restrained interaction rhythm. */
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 7rem; }
+  body { -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, h4 { letter-spacing: -0.035em; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  :where(button, a, input, select, textarea):focus-visible {
+    outline: 2px solid #a1a1aa;
+    outline-offset: 4px;
+  }
+  ::selection { background: #d4d4d8; color: #09090b; }
+  button:disabled { cursor: not-allowed; }
+}
+@layer components {
+  .product-card {
+    transition: transform 320ms cubic-bezier(.2,.7,.2,1);
+    transform-style: preserve-3d;
+  }
+  .product-card .backface-hidden {
+    box-shadow: 0 16px 40px -16px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.025);
+  }
+  .product-card:focus-within .backface-hidden { border-color: #52525b; }
+  [role="dialog"], [aria-modal="true"] { box-shadow: 0 32px 100px rgba(0,0,0,.75); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .product-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .product-card, .product-card:hover { transform: none; }
+}

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="760" viewBox="0 0 1040 760" fill="none">
+  <defs>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".85" fill="#35586f" opacity=".085"/></pattern>
+    <linearGradient id="blue" x2="1" y2="1"><stop stop-color="#d8e6ef"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
+    <linearGradient id="purple" x2="1" y2="1"><stop stop-color="#e3dbef"/><stop offset="1" stop-color="#f1edf6"/></linearGradient>
+    <linearGradient id="green" x2="1" y2="1"><stop stop-color="#dbe9df"/><stop offset="1" stop-color="#eff4f0"/></linearGradient>
+  </defs>
+  <path fill="url(#dots)" d="M0 0h1040v760H0z"/>
+  <g stroke="#628397" stroke-opacity=".12" stroke-width="1.2">
+    <path d="M115 135H255Q285 135 285 165V215Q285 245 315 245H440"/>
+    <path d="M830 120H695Q665 120 665 150V235Q665 265 635 265H535"/>
+    <path d="M165 545H300Q330 545 330 515V420Q330 390 360 390H470"/>
+    <path d="M810 525H655Q625 525 625 555V655Q625 685 595 685H425"/>
+    <path d="M-20 345H80Q110 345 110 375V430"/>
+    <path d="M1045 340H930Q900 340 900 310V255"/>
+  </g>
+  <g fill="#628397" fill-opacity=".22"><circle cx="255" cy="135" r="3"/><circle cx="665" cy="205" r="3"/><circle cx="330" cy="470" r="3"/><circle cx="625" cy="625" r="3"/><circle cx="930" cy="340" r="3"/></g>
+  <!-- Streaming: a playback window and film-strip detail. -->
+  <g transform="translate(52 64) rotate(-8 60 50)" opacity=".63">
+    <rect x="0" y="0" width="126" height="94" rx="18" fill="url(#blue)" stroke="#698b9f" stroke-opacity=".25"/>
+    <rect x="17" y="17" width="92" height="58" rx="9" stroke="#426a82" stroke-opacity=".38" stroke-width="1.8"/>
+    <path d="m53 31 24 15-24 15V31Z" fill="#426a82" fill-opacity=".25"/>
+    <path d="M30 25h5m-5 41h5m57-41h5m-5 41h5" stroke="#426a82" stroke-opacity=".28" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- AI: a processor, nodes and a small inference sparkle. -->
+  <g transform="translate(810 68) rotate(8 48 48)" opacity=".64">
+    <rect width="100" height="100" rx="22" fill="url(#purple)" stroke="#89719f" stroke-opacity=".22"/>
+    <g stroke="#765b91" stroke-width="1.8" stroke-opacity=".4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="28" y="28" width="44" height="44" rx="9"/>
+      <path d="M38 28v-9m12 9v-9m12 9v-9m-24 53v9m12-9v9m12-9v9M28 38h-9m9 12h-9m9 12h-9m53-24h9m-9 12h9m-9 12h9M39 54l11-13 11 13m-11-13v21"/>
+    </g>
+    <path d="m109 0 3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9Z" fill="#765b91" fill-opacity=".2"/>
+  </g>
+  <!-- Creative tools: editable canvas, handles and a pen nib. -->
+  <g transform="translate(453 233) rotate(-5 50 46)" opacity=".55">
+    <rect width="108" height="98" rx="18" fill="#f0e5db" stroke="#a17a59" stroke-opacity=".2"/>
+    <g stroke="#946c4e" stroke-opacity=".37" stroke-width="1.7" stroke-linejoin="round">
+      <path d="M27 25h54v49H27z" stroke-dasharray="4 5"/>
+      <path d="m47 66 17-35 13 13-30 22Zm0 0 17-18"/>
+      <circle cx="64" cy="48" r="3"/>
+      <path d="M23 21h8v8h-8zm54 0h8v8h-8zM23 70h8v8h-8z" fill="#f0e5db"/>
+    </g>
+  </g>
+  <!-- Office tools: a document with a spreadsheet grid. -->
+  <g transform="translate(762 487) rotate(-7 52 58)" opacity=".61">
+    <rect width="108" height="120" rx="20" fill="url(#green)" stroke="#6c9177" stroke-opacity=".22"/>
+    <g stroke="#4d785c" stroke-width="1.6" stroke-opacity=".38" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M29 20h35l17 17v63H29V20Z"/><path d="M64 20v18h17M40 54h29M40 68h29M40 82h29M50 54v28m10-28v28"/>
+    </g>
+  </g>
+  <!-- Cloud access: files and subscriptions available digitally. -->
+  <g transform="translate(102 495) rotate(7 60 46)" opacity=".58">
+    <rect width="130" height="98" rx="21" fill="url(#blue)" stroke="#698b9f" stroke-opacity=".22"/>
+    <path d="M43 66H35a14 14 0 0 1-1-28 23 23 0 0 1 44-7 18 18 0 0 1 6 35h-9M59 78V48m-11 11 11-11 11 11" stroke="#426a82" stroke-opacity=".39" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g stroke="#8c735d" stroke-opacity=".18" stroke-linecap="round"><path d="M355 98h10m-5-5v10M946 630h10m-5-5v10M405 602h10m-5-5v10"/></g>
+</svg>
