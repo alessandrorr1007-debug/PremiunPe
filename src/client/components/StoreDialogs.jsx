@@ -27,7 +27,7 @@ export function StoreDialogsProvider({ children }) {
   const selectedProduct = dialog?.product;
   const product = selectedProduct && (products.find(item =>
     (selectedProduct.id != null && item.id === selectedProduct.id) || item.name === selectedProduct.name
-  ) || selectedProduct);
+  ) || null);
   const isDetails = dialog?.view === 'details';
   const isComboOrder = dialog?.view === 'combo-order';
   const items = isComboOrder ? combo : product ? [product] : [];
@@ -36,12 +36,12 @@ export function StoreDialogsProvider({ children }) {
   const benefitInfo = getProductBenefitInfo(product);
   const includes = Array.isArray(product?.includes) ? product.includes.filter(item => typeof item === 'string' && item.trim()) : [];
   const whatsappUrl = isComboOrder ? createComboWhatsAppUrl(settings?.whatsapp_number, items) : createProductWhatsAppUrl(settings?.whatsapp_number, product);
-  const canContinue = items.length > 0;
+  const canContinue = items.length > 0 && items.every(item => item.available !== false);
 
   return (
     <DialogContext.Provider value={actions}>
       {children}
-      {dialog && (
+      {dialog && (isComboOrder || product) && (
         <StoreDialog title={isDetails ? product.name : 'Revisa tu pedido'} viewKey={dialog.view} onClose={closeDialog}
           subtitle={isDetails ? 'Beneficios, modalidad y condiciones disponibles' : isComboOrder ? 'Estos son los servicios de tu combo actual' : 'Estás pidiendo únicamente este servicio'}
           footer={isDetails ? (

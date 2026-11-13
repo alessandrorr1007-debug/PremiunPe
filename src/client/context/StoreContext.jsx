@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { INITIAL_PRODUCTS, DEFAULT_SETTINGS } from '../lib/mockData';
 
@@ -8,11 +8,12 @@ const COMBO_STORAGE_KEY = 'premiumpe_user_combo_v1';
 export function StoreProvider({ children }) {
   // Cargar productos locales con fallback a INITIAL_PRODUCTS
   const [products, setProducts] = useState(() => {
+    if (supabase) return [];
     try {
       const saved = localStorage.getItem('premiumpe_products');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (err) {
       console.warn('Error al leer productos locales:', err);
@@ -22,6 +23,7 @@ export function StoreProvider({ children }) {
 
   // Cargar settings locales con fallback a DEFAULT_SETTINGS
   const [settings, setSettings] = useState(() => {
+    if (supabase) return DEFAULT_SETTINGS;
     try {
       const saved = localStorage.getItem('premiumpe_settings');
       if (saved) {
@@ -35,6 +37,7 @@ export function StoreProvider({ children }) {
   });
 
   const [loading, setLoading] = useState(true);
+  const productRequest = useRef(0);
   const [error, setError] = useState(null);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [hasSparkled, setHasSparkled] = useState(false);
@@ -69,6 +72,8 @@ export function StoreProvider({ children }) {
 
   // Escuchar eventos en vivo desde el Admin en la misma pestaña y entre pestañas
   useEffect(() => {
+    if (supabase) return;
+
     const handleProductsUpdate = (e) => {
       if (e?.detail && Array.isArray(e.detail)) {
         setProducts(e.detail);
@@ -114,6 +119,7 @@ export function StoreProvider({ children }) {
   // Cargar productos visibles desde Supabase o localStorage
   const loadProducts = useCallback(async () => {
     if (isSupabaseConfigured() && supabase) {
+      const request = ++productRequest.current;
       try {
         const { data, error: supaErr } = await supabase
           .from('products')
@@ -123,18 +129,13 @@ export function StoreProvider({ children }) {
           .order('created_at', { ascending: false });
 
         if (supaErr) throw supaErr;
-        if (data && data.length > 0) {
-          setProducts(data);
-          setError(null);
-        }
+        if (request !== productRequest.current) return;
+        setProducts(data || []);
+        setError(null);
       } catch (err) {
-        console.warn('Usando catálogo local por fallback:', err);
-        try {
-          const saved = localStorage.getItem('premiumpe_products');
-          if (saved) setProducts(JSON.parse(saved));
-        } catch (e) {
-          // Mantener products
-        }
+        if (request !== productRequest.current) return;
+        console.warn('No se pudo cargar el catálogo compartido:', err);
+        setError('No se pudo consultar el catálogo. Intenta de nuevo.');
       }
     } else {
       try {
@@ -189,6 +190,13 @@ export function StoreProvider({ children }) {
 
     // Sincronización en tiempo real (PostgreSQL changes)
     if (isSupabaseConfigured() && supabase) {
+      function refresh() {
+        if (document.visibilityState === 'visible') {
+          loadProducts();
+          loadSettings();
+        }
+      }
+
       const channel = supabase
         .channel('public-store-sync')
         .on(
@@ -205,9 +213,16 @@ export function StoreProvider({ children }) {
             loadSettings();
           }
         )
-        .subscribe();
+        .subscribe(status => {
+          if (status === 'SUBSCRIBED') refresh();
+        });
+
+      const interval = window.setInterval(refresh, 30000);
+      window.addEventListener('focus', refresh);
 
       return () => {
+        window.clearInterval(interval);
+        window.removeEventListener('focus', refresh);
         supabase.removeChannel(channel);
       };
     }
@@ -235,8 +250,9 @@ export function StoreProvider({ children }) {
 
   // Manejador para quitar del combo
   const removeFromCombo = useCallback((identifier) => {
-    setCombo(prev => prev.filter(item => item.id !== identifier && item.name !== identifier));
-  }, []);
+    const name = products.find(product => product.id === identifier)?.name;
+    setCombo(prev => prev.filter(item => item.id !== identifier && item.name !== identifier && item.name !== name));
+  }, [products]);
 
   const clearCombo = useCallback(() => {
     setCombo([]);
@@ -248,7 +264,13 @@ export function StoreProvider({ children }) {
     loading,
     error,
     retryLoad: fetchData,
-    combo,
+    combo: supabase
+      ? combo.flatMap(item => {
+          const current = products.find(product => product.id === item.id ||
+            (String(item.id).startsWith('prod-') && product.name === item.name));
+          return current && current.available !== false ? [current] : [];
+        })
+      : combo,
     addToCombo,
     removeFromCombo,
     clearCombo,

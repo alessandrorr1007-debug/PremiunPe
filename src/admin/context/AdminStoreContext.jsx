@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useAuth } from './AuthContext';
 import { INITIAL_PRODUCTS, DEFAULT_SETTINGS } from '../lib/mockData';
 
 const AdminStoreContext = createContext(null);
 
 export function AdminStoreProvider({ children }) {
+  const { isAdmin, loading: authLoading } = useAuth();
   const [products, setProducts] = useState([]);
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
@@ -31,13 +33,14 @@ export function AdminStoreProvider({ children }) {
         setProducts(data || []);
         setIsLive(true);
       } catch (err) {
-        console.warn('Error cargando productos de Supabase, usando fallback local:', err);
-        fallbackLocalProducts();
+        console.warn('Error cargando productos de Supabase:', err);
+        setIsLive(false);
+        showToast('No se pudo cargar el catálogo compartido.', 'error');
       }
     } else {
       fallbackLocalProducts();
     }
-  }, []);
+  }, [showToast]);
 
   const fallbackLocalProducts = () => {
     const saved = localStorage.getItem('premiumpe_products');
@@ -89,6 +92,8 @@ export function AdminStoreProvider({ children }) {
   };
 
   useEffect(() => {
+    if (supabase && (authLoading || !isAdmin)) return;
+
     const init = async () => {
       setLoading(true);
       await Promise.all([loadProducts(), loadSettings()]);
@@ -120,7 +125,7 @@ export function AdminStoreProvider({ children }) {
         supabase.removeChannel(channel);
       };
     }
-  }, [loadProducts, loadSettings]);
+  }, [authLoading, isAdmin, loadProducts, loadSettings]);
 
   const persistLocalProducts = (updated) => {
     setProducts(updated);
@@ -152,12 +157,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ price: parsedPrice })
-          .eq('id', id);
+          .eq('id', id)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast('Precio actualizado en Supabase.', 'success');
         await loadProducts();
         return true;
@@ -183,12 +190,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ available: nextStatus })
-          .eq('id', id);
+          .eq('id', id)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast(`Marcado como ${nextStatus ? 'Disponible' : 'Agotado'}.`, 'success');
         await loadProducts();
       } catch (err) {
@@ -211,12 +220,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ visible: nextVisible })
-          .eq('id', id);
+          .eq('id', id)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast(`Visibilidad ${nextVisible ? 'activada' : 'oculta'} en el catálogo.`, 'info');
         await loadProducts();
       } catch (err) {
@@ -239,12 +250,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ featured: nextFeatured })
-          .eq('id', id);
+          .eq('id', id)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast(`Producto ${nextFeatured ? 'destacado' : 'normal'}.`, 'info');
         await loadProducts();
       } catch (err) {
@@ -299,7 +312,7 @@ export function AdminStoreProvider({ children }) {
       };
       const updated = [newProduct, ...products];
       persistLocalProducts(updated);
-      showToast('¡Producto creado con éxito!', 'success');
+      showToast('Producto creado en este navegador. Los clientes no verán el cambio.', 'info');
       return newProduct;
     }
   };
@@ -330,6 +343,7 @@ export function AdminStoreProvider({ children }) {
           .select();
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast('¡Producto actualizado con éxito!', 'success');
         await loadProducts();
         return data?.[0];
@@ -342,7 +356,7 @@ export function AdminStoreProvider({ children }) {
         p.id === id ? { ...p, ...cleanData } : p
       );
       persistLocalProducts(updated);
-      showToast('¡Producto actualizado con éxito!', 'success');
+      showToast('Producto actualizado en este navegador. Los clientes no verán el cambio.', 'info');
       return { id, ...cleanData };
     }
   };
@@ -351,12 +365,14 @@ export function AdminStoreProvider({ children }) {
   const deleteProduct = async (id) => {
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .delete()
-          .eq('id', id);
+          .eq('id', id)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast('Producto eliminado.', 'info');
         await loadProducts();
         return true;
@@ -367,7 +383,7 @@ export function AdminStoreProvider({ children }) {
     } else {
       const updated = products.filter((p) => p.id !== id);
       persistLocalProducts(updated);
-      showToast('Producto eliminado.', 'info');
+      showToast('Producto eliminado en este navegador. Los clientes no verán el cambio.', 'info');
       return true;
     }
   };
@@ -401,12 +417,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ available })
-          .in('id', ids);
+          .in('id', ids)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast(`${ids.length} productos marcados como ${available ? 'Disponibles' : 'Agotados'}.`, 'success');
         await loadProducts();
       } catch (err) {
@@ -426,12 +444,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ visible })
-          .in('id', ids);
+          .in('id', ids)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast(`${ids.length} productos marcados como ${visible ? 'Visibles' : 'Ocultos'}.`, 'info');
         await loadProducts();
       } catch (err) {
@@ -451,12 +471,14 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .delete()
-          .in('id', ids);
+          .in('id', ids)
+          .select('id');
 
         if (error) throw error;
+        if (!data?.length) throw new Error('No se modificó ningún producto en el catálogo compartido.');
         showToast(`${ids.length} productos eliminados con éxito.`, 'info');
         await loadProducts();
         return true;

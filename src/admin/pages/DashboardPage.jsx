@@ -5,6 +5,7 @@ import ProductsTab from '../components/products/ProductsTab';
 import SettingsTab from '../components/SettingsTab';
 import ProductDrawer from '../components/products/ProductDrawer';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import { supabase } from '../lib/supabase';
 import { useAdminStore } from '../context/AdminStoreContext';
 
 export default function DashboardPage() {
@@ -74,6 +75,12 @@ export default function DashboardPage() {
       onTabChange={setActiveTab} 
       onOpenCreate={handleOpenCreate}
     >
+      {!supabase && (
+        <p role="status" className="mb-5 rounded-xl border border-aji/30 bg-aji/10 p-4 text-sm text-aji">
+          Modo local. Los cambios se guardan en este navegador. Conecta Supabase para publicarlos en la tienda.
+        </p>
+      )}
+
       {/* 1. VISTA DE RESUMEN */}
       {activeTab === 'summary' && (
         <SummaryTab

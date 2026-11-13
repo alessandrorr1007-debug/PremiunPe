@@ -138,13 +138,7 @@ VALUES (
         "facebook": "https://facebook.com/premiumpe"
     }'::jsonb
 )
-ON CONFLICT (id) DO UPDATE SET
-    whatsapp_number = EXCLUDED.whatsapp_number,
-    store_name = EXCLUDED.store_name,
-    hero_badge = EXCLUDED.hero_badge,
-    hero_title = EXCLUDED.hero_title,
-    hero_subtitle = EXCLUDED.hero_subtitle,
-    payment_methods = EXCLUDED.payment_methods;
+ON CONFLICT (id) DO NOTHING;
 
 -- 4. POLÍTICAS DE SEGURIDAD ROW LEVEL SECURITY (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -245,112 +239,17 @@ CREATE POLICY "Admin can delete product images"
         AND (auth.jwt() ->> 'email') = 'admin@premiumpe.com'
     );
 
--- 6. DATOS DE PRODUCTOS EXACTOS (Limpiando datos de ejemplo anteriores)
-DELETE FROM public.products;
-
-INSERT INTO public.products (name, description, category, price, delivery_type, includes, accent, available, visible, featured, sort_order)
-VALUES
-    (
-        'Disney+ Premium',
-        'Películas, series y documentales para toda la familia en alta definición.',
-        'Streaming',
-        12.00,
-        'perfil',
-        '["Perfil individual con clave PIN", "Transmisión en alta definición", "Sin cortes en la reproducción"]'::jsonb,
-        'rocoto',
-        true,
-        true,
-        true,
-        1
-    ),
-    (
-        'HBO Max Estándar',
-        'Series aclamadas, películas de estreno y producciones exclusivas.',
-        'Streaming',
-        10.00,
-        'perfil',
-        '["Perfil individual con clave PIN", "Catálogo completo de estrenos", "Acceso en múltiples dispositivos"]'::jsonb,
-        'rocoto',
-        true,
-        true,
-        false,
-        2
-    ),
-    (
-        'Vix Premium',
-        'Series en español, novelas y contenido exclusivo sin interrupciones.',
-        'Streaming',
-        10.00,
-        'perfil',
-        '["Perfil individual con clave PIN", "Contenido en idioma español", "Acceso inmediato garantizado"]'::jsonb,
-        'rocoto',
-        true,
-        true,
-        false,
-        3
-    ),
-    (
-        'Prime Video',
-        'Películas y series exclusivas con opción de reproducción en cualquier momento.',
-        'Streaming',
-        12.00,
-        'perfil',
-        '["Perfil individual con clave PIN", "Catálogo amplio de producciones", "Compatible con Smart TV y celular"]'::jsonb,
-        'rocoto',
-        true,
-        true,
-        false,
-        4
-    ),
-    (
-        'Canva Pro',
-        'Diseño profesional con kits de marca, plantillas y herramientas creativas.',
-        'Herramientas',
-        8.00,
-        'activacion_tu_cuenta',
-        '["Activación directa en tu correo", "Millones de plantillas premium", "Herramientas de edición avanzadas"]'::jsonb,
-        'lime',
-        true,
-        true,
-        true,
-        5
-    ),
-    (
-        'Office 365',
-        'Herramientas de productividad y almacenamiento para tus proyectos diarios.',
-        'Herramientas',
-        15.00,
-        'cuenta_entregada',
-        '["Word, Excel, PowerPoint y Outlook", "Almacenamiento en la nube", "Uso en varios dispositivos"]'::jsonb,
-        'lime',
-        true,
-        true,
-        false,
-        6
-    ),
-    (
-        'Gemini',
-        'Asistente inteligente para redactar, analizar y resolver tareas complejas.',
-        'IA',
-        10.00,
-        'activacion_tu_cuenta',
-        '["Activación en tu cuenta personal", "Respuestas rápidas y análisis", "Asistencia para trabajo y estudio"]'::jsonb,
-        'aji',
-        true,
-        true,
-        true,
-        7
-    ),
-    (
-        'ChatGPT Plus',
-        'Inteligencia artificial para generación de contenidos, textos y asistencia creativa.',
-        'IA',
-        40.00,
-        'cuenta_entregada',
-        '["Cuenta entregada lista para usar", "Acceso prioritario a herramientas de IA", "Generación de texto y asistencia"]'::jsonb,
-        'aji',
-        true,
-        true,
-        true,
-        8
-    );
+DO $$
+DECLARE
+    table_name text;
+BEGIN
+    FOREACH table_name IN ARRAY ARRAY['products', 'settings'] LOOP
+        IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
+           AND NOT EXISTS (
+               SELECT 1 FROM pg_publication_tables
+               WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = table_name
+           ) THEN
+            EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', table_name);
+        END IF;
+    END LOOP;
+END $$;
