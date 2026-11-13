@@ -1,54 +1,34 @@
-# 🇵🇪 PremiumPe - Pases Digitales & Membresías en Perú
+# PremiumPe
 
-Sitio web y catálogo de suscripciones digitales en Perú (Disney+, Canva Pro, ChatGPT Plus, Prime Video, etc.) con panel de administración integrado y sincronización en tiempo real.
+[PremiumPe](https://premiunpee.netlify.app/) es una tienda peruana de suscripciones digitales con catálogo público y panel administrativo.
 
----
+## Tienda
 
-## 🔐 Acceso Administrativo
+- Portada clara con una ilustración de Machu Picchu y un catálogo adaptable con dos columnas en celular y cuatro en pantallas grandes.
+- Búsqueda de servicios y filtros de Streaming, Herramientas e IA.
+- Portadas para Disney+, HBO Max, ViX, Prime Video, Canva Pro, Office 365, Gemini y ChatGPT Plus.
+- Precios en soles, pedidos individuales o por combo mediante WhatsApp y pagos por Yape y Plin.
+- Íconos de Facebook, Instagram y TikTok visibles en el pie de página, sin enlaces activos.
 
-- **Ruta directa:** `/admin` o `/login`
-- **Desde la tienda:** Haz clic en el botón de configuración ⚙️ ubicado en la barra de navegación (header) o en el pie de página.
-- **Credenciales autorizadas:**
-  - **Usuario:** `cheridecheros`
-  - **Contraseña:** `cherigey`
+## Panel administrativo
 
-Dentro del panel de administración podrás:
-- Crear, editar y eliminar productos.
-- Ajustar precios en Soles (S/) en tiempo real.
-- Cambiar la disponibilidad (Disponible / Agotado) y visibilidad de los productos.
-- Configurar el número de WhatsApp, textos del Hero y redes sociales.
-- Hacer clic en **"Ver Tienda"** en la barra superior para volver a la tienda pública y verificar los cambios inmediatamente.
+Abre `/login` o selecciona **Iniciar sesión** desde la tienda. Usa las credenciales que te entregue el responsable del acceso por un canal privado.
 
----
+En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. Usa **Ver Tienda** para regresar al catálogo.
 
-## 🌐 Despliegue en Netlify
-
-El proyecto ya está configurado con `netlify.toml` en la raíz para desplegarse con un solo clic:
-
-1. Conecta tu repositorio de GitHub en Netlify.
-2. Netlify detectará automáticamente:
-   - **Build command:** `npm run build`
-   - **Publish directory:** `dist`
-3. En **Environment Variables** (opcional si usas Supabase):
-   - `VITE_SUPABASE_URL` = Tu URL de Supabase
-   - `VITE_SUPABASE_ANON_KEY` = Tu Anon Key de Supabase
-   - `VITE_DEFAULT_WHATSAPP` = `51942990279`
-4. ¡Listo! El sitio cargará directamente la tienda de clientes (`/`), sin pantalla en blanco, y el botón ⚙️ permitirá entrar al panel administrativo.
-
----
-
-## 💻 Desarrollo Local
+## Desarrollo local
 
 ```bash
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo
+npm ci
 npm run dev
-
-# Compilar para producción
 npm run build
-
-# Probar la compilación localmente
 npm run preview
 ```
+
+`npm run dev` inicia Vite. `npm run build` genera la versión de producción en `dist` y `npm run preview` permite revisarla localmente.
+
+## Despliegue en Netlify
+
+Conecta la rama `main`. Netlify lee `netlify.toml`, ejecuta `npm run build` y publica `dist`. La regla de redirección permite abrir rutas directas como `/login` y `/admin`.
+
+Si usas Supabase, configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en Netlify. También puedes definir `VITE_DEFAULT_WHATSAPP` para establecer el número de contacto por defecto. Consulta `.env.example` para ver el formato. Las variables `VITE_` llegan al navegador, así que solo deben contener valores públicos.
