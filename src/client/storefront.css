@@ -103,3 +103,29 @@ html[data-store-theme="light"] footer.store-footer {
 html[data-store-theme="light"] .store-combo > div { background: rgb(var(--store-surface)); }
 .store-whatsapp svg { fill: none; }
 .market-cover, .market-card-actions button, .market-filters button { touch-action: manipulation; }
+
+.market-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.market-cover:has(img) { color: #fff; }
+.market-cover:has(img)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgb(21 13 35 / .62), rgb(21 13 35 / .32));
+}
+.market-cover > span { position: relative; z-index: 1; }
+.market-cover:has(img) > span { text-shadow: 0 2px 8px #171020; }
+.market-cover-icon {
+  position: absolute;
+  width: 46%;
+  height: 70%;
+  right: -3%;
+  bottom: -16%;
+  opacity: .18;
+  transform: rotate(-15deg);
+}
