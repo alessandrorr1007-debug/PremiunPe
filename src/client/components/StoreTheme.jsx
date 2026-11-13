@@ -3,8 +3,8 @@ import React, { createContext, useContext, useEffect, useLayoutEffect, useState 
 const ThemeContext = createContext(null);
 const THEME_KEY = 'premiumpe_theme';
 const readTheme = () => {
-  try { return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'; }
-  catch { return 'dark'; }
+  try { return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; }
+  catch { return 'light'; }
 };
 
 export function StoreThemeProvider({ children }) {
@@ -19,7 +19,7 @@ export function StoreThemeProvider({ children }) {
   }, [theme]);
   useEffect(() => {
     const sync = event => {
-      if (event.key === THEME_KEY || event.key === null) setTheme(event.newValue === 'light' ? 'light' : 'dark');
+      if (event.key === THEME_KEY || event.key === null) setTheme(event.newValue === 'dark' ? 'dark' : 'light');
     };
     window.addEventListener('storage', sync);
     return () => window.removeEventListener('storage', sync);

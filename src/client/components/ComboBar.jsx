@@ -74,7 +74,7 @@ export default function ComboBar() {
   };
 
   return (
-    <aside ref={overlayRef} aria-label="Tu combo de servicios" className="store-combo fixed inset-x-0 z-40 max-w-5xl mx-auto px-3 sm:px-4 pointer-events-none">
+    <aside id="tu-combo" tabIndex={-1} ref={overlayRef} aria-label="Tu combo de servicios" className="store-combo fixed inset-x-0 z-40 max-w-5xl mx-auto px-3 sm:px-4 pointer-events-none">
       <motion.div layout={!reduceMotion} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}
         className={`pointer-events-auto p-3 sm:p-5 rounded-[24px] bg-surface/95 backdrop-blur-2xl border transition-colors duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 ${isDragOver ? 'border-aji' : 'border-aji/30'}`}>
         <div className="flex items-start gap-3 w-full sm:flex-1 min-w-0">
