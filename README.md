@@ -1,6 +1,8 @@
 # PremiumPe
 
-[PremiumPe](https://premiunpee.netlify.app/) es una tienda peruana de suscripciones digitales con catálogo público y panel administrativo.
+**Sitio oficial:** [https://premiunpee.netlify.app/](https://premiunpee.netlify.app/)
+
+PremiumPe es una tienda peruana de suscripciones digitales con catálogo público y panel administrativo.
 
 ## Tienda
 

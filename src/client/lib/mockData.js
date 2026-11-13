@@ -245,7 +245,16 @@ export function createProductWhatsAppUrl(phone, product) {
   const cleanPhone = formatWhatsAppNumber(phone);
   const priceStr = formatPriceNumber(product?.price || 0);
   const name = product?.name || 'servicio';
-  const message = `Hola, me interesa ${name} a S/ ${priceStr} al mes. ¿Está disponible?`;
+  const delivery = DELIVERY_TYPE_LABELS[product?.delivery_type];
+  const message = [
+    '¡Hola, equipo de PremiumPe! Quisiera solicitar este plan:',
+    '',
+    `📦 Servicio: ${name}`,
+    `💰 Precio mensual: S/ ${priceStr}`,
+    ...(delivery ? [`🔑 Modalidad: ${delivery}`] : []),
+    '',
+    '¿Me confirman la disponibilidad, el tiempo de activación y los pasos para pagar por Yape o Plin? Gracias.',
+  ].join('\n');
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 
