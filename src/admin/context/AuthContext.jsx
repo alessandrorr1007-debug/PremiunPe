@@ -5,8 +5,8 @@ const ADMIN_EMAIL = 'admin@premiumpe.com';
 
 // Credenciales autorizadas para acceso administrativo
 const LOCAL_CREDENTIALS = [
-  { username: 'cheridecheros', password: 'cherigey', email: 'cheridecheros@premiumpe.com' },
-  { username: 'cheridecheros@premiumpe.com', password: 'cherigey', email: 'cheridecheros@premiumpe.com' },
+  { username: 'cheridecheros', password: 'Pool', email: 'cheridecheros@premiumpe.com' },
+  { username: 'cheridecheros@premiumpe.com', password: 'Pool', email: 'cheridecheros@premiumpe.com' },
   { username: 'admin@premiumpe.com', password: 'PremiumPe#2026!k9Q', email: ADMIN_EMAIL },
   { username: 'admin', password: 'PremiumPe#2026!k9Q', email: ADMIN_EMAIL }
 ];
@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
     const trimmedId = (identifier || '').trim().toLowerCase();
     const trimmedPass = (password || '').trim();
 
-    // 1. Verificación directa contra credenciales autorizadas (cheridecheros / cherigey)
+    // 1. Verificación directa contra credenciales locales
     const matchedCred = LOCAL_CREDENTIALS.find(
       (c) => c.username.toLowerCase() === trimmedId && c.password === trimmedPass
     );

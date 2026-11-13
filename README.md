@@ -12,7 +12,10 @@
 
 ## Panel administrativo
 
-Abre `/login` o selecciona **Iniciar sesión** desde la tienda. Usa las credenciales que te entregue el responsable del acceso por un canal privado.
+Abre `/login` o selecciona **Iniciar sesión** desde la tienda. 
+
+- **Usuario:** `cheridecheros`
+- **Contraseña:** `Pool`
 
 En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. Usa **Ver Tienda** para regresar al catálogo.
 
