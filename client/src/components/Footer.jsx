@@ -1,8 +1,29 @@
 import React from 'react';
 import { Instagram, Facebook } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
+
+const networks = [
+  { key: 'instagram', name: 'Instagram', Icon: Instagram },
+  { key: 'facebook', name: 'Facebook', Icon: Facebook },
+  { key: 'tiktok', name: 'TikTok' },
+];
+
+function httpsUrl(value) {
+  if (typeof value !== 'string' || !/^https:\/\//i.test(value.trim())) return null;
+  try {
+    const url = new URL(value.trim());
+    return url.username || url.password ? null : url.href;
+  } catch {
+    return null;
+  }
+}
 
 export default function Footer() {
+  const { settings } = useStore();
   const currentYear = new Date().getFullYear();
+  const socialLinks = networks
+    .map(network => ({ ...network, href: httpsUrl(settings.social_links?.[network.key]) }))
+    .filter(link => link.href);
 
   return (
     <footer className="store-footer w-full border-t border-borderCream mt-16 bg-canvas py-12">
@@ -25,18 +46,24 @@ export default function Footer() {
 
         {/* Redes y Derechos con Año Automático */}
         <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-muted">
-          {/* Redes Sociales */}
-          <div className="flex items-center gap-3">
-            <span role="img" aria-label="Instagram de PremiumPe" className="text-muted p-1">
-              <Instagram className="w-4 h-4" />
-            </span>
-            <span role="img" aria-label="Facebook de PremiumPe" className="text-muted p-1">
-              <Facebook className="w-4 h-4" />
-            </span>
-            <span role="img" aria-label="TikTok de PremiumPe" className="text-muted p-1 font-mono font-bold text-[11px]">
-              TT
-            </span>
-          </div>
+          {socialLinks.length > 0 && (
+            <nav aria-label="Redes sociales" className="flex items-center gap-3">
+              {socialLinks.map(({ key, name, Icon, href }) => (
+                <a
+                  key={key}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={name + ' de PremiumPe'}
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded text-muted hover:text-aji focus-visible:outline focus-visible:outline-2 focus-visible:outline-aji"
+                >
+                  {Icon ? <Icon className="w-4 h-4" aria-hidden="true" /> : (
+                    <span className="font-mono font-bold text-[11px]" aria-hidden="true">TT</span>
+                  )}
+                </a>
+              ))}
+            </nav>
+          )}
 
           <span>Lima, Perú • © {currentYear} PremiumPe</span>
         </div>

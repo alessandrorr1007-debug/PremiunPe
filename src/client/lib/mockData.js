@@ -30,11 +30,7 @@ export const DEFAULT_SETTINGS = {
       answer: 'Cada servicio cuenta con reposición prioritaria según los términos acordados si ocurre alguna eventualidad técnica durante tu periodo contratado.'
     }
   ],
-  social_links: {
-    instagram: 'https://instagram.com/premiumpe',
-    tiktok: 'https://tiktok.com/@premiumpe',
-    facebook: 'https://facebook.com/premiumpe'
-  }
+  social_links: {}
 };
 
 export const INITIAL_PRODUCTS = [

@@ -155,18 +155,15 @@ export function StoreProvider({ children }) {
           .select('*')
           .eq('id', 1)
           .abortSignal(AbortSignal.timeout(10000))
-          .single();
+          .maybeSingle();
 
-        if (supaErr && supaErr.code !== 'PGRST116') throw supaErr;
-        if (data) {
-          setSettings(prev => ({
-            ...prev,
-            ...data,
-            // Fallback de social_links y faq si vienen nulos
-            social_links: data.social_links || prev.social_links,
-            faq: data.faq && Array.isArray(data.faq) && data.faq.length > 0 ? data.faq : prev.faq
-          }));
-        }
+        if (supaErr) throw supaErr;
+        setSettings(prev => ({
+          ...prev,
+          ...data,
+          social_links: data?.social_links ?? {},
+          faq: Array.isArray(data?.faq) && data.faq.length > 0 ? data.faq : prev.faq
+        }));
       } catch (err) {
         console.warn('Usando configuración fallback:', err);
       }

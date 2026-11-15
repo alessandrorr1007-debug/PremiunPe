@@ -10,7 +10,7 @@ PremiumPe es una tienda peruana de suscripciones digitales con catálogo públic
 - Búsqueda de servicios y filtros de Streaming, Herramientas e IA.
 - Portadas para Disney+, HBO Max, ViX, Prime Video, Canva Pro, Office 365, Gemini y ChatGPT Plus.
 - Precios en soles, pedidos individuales o por combo mediante WhatsApp y pagos por Yape y Plin.
-- Íconos de Facebook, Instagram y TikTok visibles en el pie de página, sin enlaces activos.
+- El pie de página muestra las redes sociales que tienen un enlace HTTPS en Configuración y las abre en una pestaña nueva.
 
 ## Panel administrativo
 

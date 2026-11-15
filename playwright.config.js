@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const mobileTests = '**/{responsive,social-links}.spec.js';
+
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.js',
@@ -15,9 +17,9 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'android', testMatch: '**/responsive.spec.js', use: { ...devices['Pixel 7'] } },
-    { name: 'iphone', testMatch: '**/responsive.spec.js', use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' } },
-    { name: 'tablet', testMatch: '**/responsive.spec.js', use: { ...devices['iPad Mini'], defaultBrowserType: 'chromium' } },
+    { name: 'android', testMatch: mobileTests, use: { ...devices['Pixel 7'] } },
+    { name: 'iphone', testMatch: mobileTests, use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' } },
+    { name: 'tablet', testMatch: mobileTests, use: { ...devices['iPad Mini'], defaultBrowserType: 'chromium' } },
   ],
   webServer: {
     command: 'npm run build -- --mode qa --outDir dist-qa && npm run preview -- --outDir dist-qa --host 127.0.0.1 --port 4183 --strictPort',

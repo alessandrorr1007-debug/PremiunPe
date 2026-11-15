@@ -81,18 +81,15 @@ export function StoreProvider({ children }) {
           .select('*')
           .eq('id', 1)
           .abortSignal(AbortSignal.timeout(10000))
-          .single();
+          .maybeSingle();
 
-        if (supaErr && supaErr.code !== 'PGRST116') throw supaErr;
-        if (data) {
-          setSettings(prev => ({
-            ...prev,
-            ...data,
-            // Fallback de social_links y faq si vienen nulos
-            social_links: data.social_links || prev.social_links,
-            faq: data.faq && Array.isArray(data.faq) && data.faq.length > 0 ? data.faq : prev.faq
-          }));
-        }
+        if (supaErr) throw supaErr;
+        setSettings(prev => ({
+          ...prev,
+          ...data,
+          social_links: data?.social_links ?? {},
+          faq: Array.isArray(data?.faq) && data.faq.length > 0 ? data.faq : prev.faq
+        }));
       } catch (err) {
         console.warn('Usando configuración fallback:', err);
       }
@@ -133,13 +130,23 @@ export function StoreProvider({ children }) {
           }
         )
         .subscribe(status => {
-          if (status === 'SUBSCRIBED') loadProducts();
+          if (status === 'SUBSCRIBED') {
+            loadProducts();
+            loadSettings();
+          }
         });
 
-      const refreshOnFocus = () => loadProducts();
+      const refreshOnFocus = () => {
+        loadProducts();
+        loadSettings();
+      };
+      const settingsInterval = window.setInterval(() => {
+        if (document.visibilityState !== 'hidden') loadSettings();
+      }, 30000);
       window.addEventListener('focus', refreshOnFocus);
 
       return () => {
+        window.clearInterval(settingsInterval);
         window.removeEventListener('focus', refreshOnFocus);
         supabase.removeChannel(channel);
       };

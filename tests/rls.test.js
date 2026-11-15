@@ -74,6 +74,22 @@ test('Storage limita escrituras al administrador y al bucket de productos', asyn
   assert.equal((await as('anon', { role: 'anon' }, tx => tx.query('SELECT name FROM storage.objects'))).rows.length, 1);
 });
 
+test('los enlaces guardados por el administrador se publican y se pueden borrar', async () => {
+  const published = { tiktok: 'https://www.tiktok.com/@premiumpe-qa', instagram: '', facebook: '' };
+  const save = (role, claims, links) => as(role, claims, tx => tx.query(
+    'UPDATE settings SET social_links = $1 WHERE id = 1 RETURNING id', [JSON.stringify(links)]
+  ));
+  const read = () => as('anon', { role: 'anon' }, tx =>
+    tx.query('SELECT social_links FROM settings WHERE id = 1')
+  );
+
+  assert.equal((await save('authenticated', admin, published)).rows.length, 1);
+  assert.equal((await save('authenticated', stranger, {})).rows.length, 0);
+  assert.deepEqual((await read()).rows, [{ social_links: published }]);
+  assert.equal((await save('authenticated', admin, {})).rows.length, 1);
+  assert.deepEqual((await read()).rows, [{ social_links: {} }]);
+});
+
 test('reaplicar el esquema conserva el catálogo y la configuración editados', async () => {
   await db.query("UPDATE settings SET store_name = 'Personalizada'");
   const previous = await db.query('SELECT id, name, price FROM products ORDER BY id');
