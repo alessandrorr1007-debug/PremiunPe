@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Instagram, Facebook } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
@@ -67,15 +66,7 @@ export default function Footer() {
           )}
 
           <div className="flex items-center gap-3">
-            <span>Lima, Perú • © {currentYear} PremiumPe</span>
-            <span>•</span>
-            <Link
-              to="/login"
-              className="text-muted hover:text-aji transition-colors inline-flex items-center gap-1"
-              title="Panel Administrativo"
-            >
-              <span>Admin</span>
-            </Link>
+            <span>Trujillo, Perú • © {currentYear} PremiumPe</span>
           </div>
         </div>
       </div>
