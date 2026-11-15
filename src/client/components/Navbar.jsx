@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useAuth } from '../../admin/context/AuthContext';
-import { Search, MessageCircle, Menu, X, Settings } from 'lucide-react';
+import { Search, MessageCircle, Menu, X, Settings, Mountain, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 import { useStoreNavigation } from '../hooks/useStoreNavigation';
@@ -10,7 +10,7 @@ import { formatWhatsAppNumber } from '../lib/mockData';
 import AdminLoginModal from './AdminLoginModal';
 
 export default function Navbar() {
-  const { settings, setCommandPaletteOpen } = useStore();
+  const { settings, setCommandPaletteOpen, combo } = useStore();
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
@@ -55,15 +55,13 @@ export default function Navbar() {
       </div>
 
       {/* Header Fijo Translúcido */}
-      <header ref={headerRef} className="fixed top-0 inset-x-0 h-20 bg-canvas/80 backdrop-blur-xl border-b border-borderCream z-40">
+      <header ref={headerRef} className="market-header fixed top-0 inset-x-0 h-20 bg-canvas/80 backdrop-blur-xl border-b border-borderCream z-40">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo PremiumPe */}
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 group" aria-label="Ir al inicio de PremiumPe">
-            <div className="w-11 h-11 rounded-2xl bg-aji text-night flex items-center justify-center font-sora font-extrabold text-2xl shadow-[0_0_20px_rgba(0,0,0,0.45)] group-hover:scale-105 transition-transform duration-200">
-              P
-            </div>
-            <span className="hidden min-[480px]:inline font-sora font-bold text-base sm:text-xl tracking-tight text-cream">
+            <Mountain className="market-logo-icon" size={38} aria-hidden="true" />
+            <span className="market-logo">
               Premium<span className="text-aji">Pe</span>
             </span>
           </a>
@@ -102,13 +100,23 @@ export default function Navbar() {
 
           {/* Buscador, Configuración & WhatsApp */}
           <div className="flex items-center gap-1 sm:gap-2.5">
-            <ThemeToggle />
+            <a href="#tu-combo" className="market-cart" aria-label={`Tu combo, ${combo.length} ${combo.length === 1 ? "servicio" : "servicios"}`} onClick={event => {
+              const panel = document.getElementById('tu-combo');
+              if (!panel) return;
+              event.preventDefault();
+              const toggle = panel.querySelector('button[aria-expanded="false"]');
+              if (toggle && toggle.getClientRects().length) toggle.click();
+              panel.focus({ preventScroll: true });
+            }}>
+              <ShoppingCart size={22} aria-hidden="true" /><span>{combo.length}</span>
+            </a>
+            <div className="market-desktop-theme"><ThemeToggle /></div>
             {/* Gatillo de Paleta de Comandos (Ctrl+K) */}
             <button
               type="button"
               onClick={() => setCommandPaletteOpen(true)}
               aria-label="Buscar servicios"
-              className="flex items-center justify-center min-h-[44px] min-w-[44px] gap-2.5 px-2 sm:px-3.5 py-2 rounded-xl bg-ink/[0.04] border border-borderCream text-muted hover:text-cream hover:border-cream/20 transition-all text-xs"
+              className="market-nav-search flex items-center justify-center min-h-[44px] min-w-[44px] gap-2.5 px-2 sm:px-3.5 py-2 rounded-xl bg-ink/[0.04] border border-borderCream text-muted hover:text-cream hover:border-cream/20 transition-all text-xs"
               title="Buscar servicio (Ctrl+K o /)"
             >
               <Search className="w-4 h-4 text-muted" />
@@ -122,11 +130,11 @@ export default function Navbar() {
             <button
               type="button"
               onClick={handleAdminAction}
-              className="relative p-2.5 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] border border-borderCream hover:border-aji/40 text-muted hover:text-aji transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer group"
+              className="market-admin relative p-2.5 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] border border-borderCream hover:border-aji/40 text-muted hover:text-aji transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer group"
               title={isAdmin ? "Panel de Administración (Conectado)" : "Configuración y Administración"}
               aria-label="Configuración de administrador"
             >
-              <Settings className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45" />
+              <Settings className="w-4 h-4" /><span className="hidden xl:inline">{isAdmin ? "Administrar" : "Iniciar sesión"}</span>
               {isAdmin && (
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-aji rounded-full ring-2 ring-night" />
               )}
@@ -137,7 +145,7 @@ export default function Navbar() {
               href={generalWhatsAppUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl bg-action text-actionInk font-sora font-semibold text-xs tracking-wide shadow-[0_0_20px_rgba(0,0,0,0.35)] hover:brightness-110 active:scale-95 transition-all min-h-[44px]"
+              className="market-nav-contact flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl bg-action text-actionInk font-sora font-semibold text-xs tracking-wide shadow-[0_0_20px_rgba(0,0,0,0.35)] hover:brightness-110 active:scale-95 transition-all min-h-[44px]"
             >
               <MessageCircle className="w-4 h-4 fill-none" />
               <span className="hidden md:inline">WhatsApp</span>
@@ -150,7 +158,7 @@ export default function Navbar() {
               aria-expanded={mobileMenuOpen}
               aria-controls="store-mobile-menu"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2.5 rounded-xl text-cream hover:bg-ink/5 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="market-menu xl:hidden p-2.5 rounded-xl text-cream hover:bg-ink/5 min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -208,6 +216,7 @@ export default function Navbar() {
                 <Settings className="w-4 h-4 text-aji" />
                 <span>Configuración y Administración</span>
               </button>
+              <div className="px-4 py-2"><ThemeToggle /></div>
             </nav>
           </motion.div>
         )}

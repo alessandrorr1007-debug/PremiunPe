@@ -1,4 +1,5 @@
 import React from 'react';
+import './storefront.css';
 import { StoreProvider } from './context/StoreContext';
 import Navbar from './components/Navbar';
 import { StoreThemeProvider } from './components/StoreTheme';
@@ -27,10 +28,10 @@ export default function ClientStoreView() {
 
         {/* Contenido principal */}
         <main className="store-main flex-1">
-          {/* 2. Hero con título, badge y mazo en abanico de tarjetas */}
+          {/* Portada */}
           <Hero />
 
-          {/* 3 & 4. Catálogo con chips, buscador y tarjetas con flip 3D */}
+          {/* Catálogo */}
           <Catalog />
 
           {/* 5. ¿Cómo comprar en 3 pasos? */}

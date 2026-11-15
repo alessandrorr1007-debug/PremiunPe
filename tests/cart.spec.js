@@ -101,7 +101,7 @@ test('CART-14 · error de red y recuperación con selección conservada', async 
   await add(page, catalog[0].name);
   state.offline = true;
   await page.reload();
-  await expect(page.getByText('Catálogo no disponible').first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'No se pudo cargar el catálogo' })).toBeVisible();
   await expect(review(page)).toBeDisabled();
   state.offline = false;
   await page.getByRole('button', { name: /reintentar|intentar de nuevo/i }).click();

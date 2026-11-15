@@ -1,0 +1,107 @@
+-- Ejecutar solo al inicializar un catálogo nuevo.
+INSERT INTO public.products (name, description, category, price, delivery_type, includes, accent, available, visible, featured, sort_order)
+VALUES
+    (
+        'Disney+ Premium',
+        'Películas, series y documentales para toda la familia en alta definición.',
+        'Streaming',
+        12.00,
+        'perfil',
+        '["Perfil individual con clave PIN", "Transmisión en alta definición", "Sin cortes en la reproducción"]'::jsonb,
+        'rocoto',
+        true,
+        true,
+        true,
+        1
+    ),
+    (
+        'HBO Max Estándar',
+        'Series aclamadas, películas de estreno y producciones exclusivas.',
+        'Streaming',
+        10.00,
+        'perfil',
+        '["Perfil individual con clave PIN", "Catálogo completo de estrenos", "Acceso en múltiples dispositivos"]'::jsonb,
+        'rocoto',
+        true,
+        true,
+        false,
+        2
+    ),
+    (
+        'Vix Premium',
+        'Series en español, novelas y contenido exclusivo sin interrupciones.',
+        'Streaming',
+        10.00,
+        'perfil',
+        '["Perfil individual con clave PIN", "Contenido en idioma español", "Acceso inmediato garantizado"]'::jsonb,
+        'rocoto',
+        true,
+        true,
+        false,
+        3
+    ),
+    (
+        'Prime Video',
+        'Películas y series exclusivas con opción de reproducción en cualquier momento.',
+        'Streaming',
+        12.00,
+        'perfil',
+        '["Perfil individual con clave PIN", "Catálogo amplio de producciones", "Compatible con Smart TV y celular"]'::jsonb,
+        'rocoto',
+        true,
+        true,
+        false,
+        4
+    ),
+    (
+        'Canva Pro',
+        'Diseño profesional con kits de marca, plantillas y herramientas creativas.',
+        'Herramientas',
+        8.00,
+        'activacion_tu_cuenta',
+        '["Activación directa en tu correo", "Millones de plantillas premium", "Herramientas de edición avanzadas"]'::jsonb,
+        'lime',
+        true,
+        true,
+        true,
+        5
+    ),
+    (
+        'Office 365',
+        'Herramientas de productividad y almacenamiento para tus proyectos diarios.',
+        'Herramientas',
+        15.00,
+        'cuenta_entregada',
+        '["Word, Excel, PowerPoint y Outlook", "Almacenamiento en la nube", "Uso en varios dispositivos"]'::jsonb,
+        'lime',
+        true,
+        true,
+        false,
+        6
+    ),
+    (
+        'Gemini',
+        'Asistente inteligente para redactar, analizar y resolver tareas complejas.',
+        'IA',
+        10.00,
+        'activacion_tu_cuenta',
+        '["Activación en tu cuenta personal", "Respuestas rápidas y análisis", "Asistencia para trabajo y estudio"]'::jsonb,
+        'aji',
+        true,
+        true,
+        true,
+        7
+    ),
+    (
+        'ChatGPT Plus',
+        'Inteligencia artificial para generación de contenidos, textos y asistencia creativa.',
+        'IA',
+        40.00,
+        'cuenta_entregada',
+        '["Cuenta entregada lista para usar", "Acceso prioritario a herramientas de IA", "Generación de texto y asistencia"]'::jsonb,
+        'aji',
+        true,
+        true,
+        true,
+        8
+    );

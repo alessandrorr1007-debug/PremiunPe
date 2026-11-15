@@ -190,6 +190,11 @@ export function StoreProvider({ children }) {
 
     // Sincronización en tiempo real (PostgreSQL changes)
     if (isSupabaseConfigured() && supabase) {
+      const refresh = () => {
+        if (document.visibilityState === 'hidden') return;
+        loadProducts();
+        loadSettings();
+      };
       const channel = supabase
         .channel('public-store-sync')
         .on(
@@ -207,14 +212,15 @@ export function StoreProvider({ children }) {
           }
         )
         .subscribe(status => {
-          if (status === 'SUBSCRIBED') loadProducts();
+          if (status === 'SUBSCRIBED') refresh();
         });
 
-      const refreshOnFocus = () => loadProducts();
-      window.addEventListener('focus', refreshOnFocus);
+      const interval = window.setInterval(refresh, 30000);
+      window.addEventListener('focus', refresh);
 
       return () => {
-        window.removeEventListener('focus', refreshOnFocus);
+        window.clearInterval(interval);
+        window.removeEventListener('focus', refresh);
         supabase.removeChannel(channel);
       };
     }

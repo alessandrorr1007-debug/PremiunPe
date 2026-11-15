@@ -33,8 +33,8 @@ export async function mockStore(page, state = { products: catalog.map(item => ({
 
 export const cart = page => page.getByRole('complementary', { name: 'Tu combo de servicios' });
 export const review = page => cart(page).getByRole('button', { name: /Revisar (mi combo|pedido)/ });
-export const catalogSearch = page => page.getByRole('textbox', { name: 'Filtrar servicios del catálogo' });
-export const addButton = page => page.getByRole('button', { name: '+ Agregar', exact: true }).first();
+export const catalogSearch = page => page.getByRole('searchbox', { name: 'Buscar servicio', exact: true });
+export const addButton = page => page.getByRole('button', { name: /^Agregar .* al combo$/ }).first();
 
 export async function count(page, number) {
   await expect(cart(page).getByText(new RegExp(`Tu combo · ${number} servicios?`)).filter({visible:true})).toBeVisible();
@@ -42,6 +42,6 @@ export async function count(page, number) {
 
 export async function add(page, name) {
   await catalogSearch(page).fill(name);
-  const product = page.locator('.product-card').filter({ has: page.getByRole('heading', { name, exact: true }) });
-  await product.getByRole('button', { name: '+ Agregar', exact: true }).click();
+  const product = page.getByRole('article').filter({ has: page.getByRole('heading', { name, exact: true }) });
+  await product.getByRole('button', { name: /^Agregar .* al combo$/ }).click();
 }

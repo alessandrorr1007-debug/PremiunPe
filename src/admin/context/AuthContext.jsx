@@ -44,8 +44,9 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     if (!supabase) throw new Error('El acceso administrativo requiere configurar Supabase.');
+    const identifier = email.trim().toLowerCase();
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
+      email: ['admin', 'cheridecheros'].includes(identifier) ? ADMIN_EMAIL : identifier,
       password,
     });
 

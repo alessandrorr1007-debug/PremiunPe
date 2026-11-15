@@ -55,7 +55,7 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   });
 
   await page.goto('/login');
-  await page.getByPlaceholder('Ingresa tu correo').fill(user.email);
+  await page.getByPlaceholder('Ingresa tu usuario o correo').fill(user.email);
   await page.locator('input[type=password]').fill('isolated-test-password');
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
   await expect(page).toHaveURL(/\/admin$/);
