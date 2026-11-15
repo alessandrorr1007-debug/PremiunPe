@@ -117,6 +117,12 @@
   footer.store-footer { padding-bottom: calc(var(--store-overlay-space, 180px) + 3rem); }
   .product-card button, .filter-btn { touch-action: manipulation; }
 }
+/* Keep the mobile review button above the hosting badge when it is present. */
+@media (max-width: 639px) {
+  body:has(#nl-badge-frame) .store-combo {
+    bottom: max(4.5rem, calc(1rem + env(safe-area-inset-bottom)));
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .store-whatsapp, .store-notice { transition: none; }
 }

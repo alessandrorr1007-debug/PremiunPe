@@ -6,7 +6,7 @@ import { useStoreDialogs } from './StoreDialogs';
 import { formatPriceNumber } from '../lib/mockData';
 
 export default function ComboBar() {
-  const { combo, removeFromCombo, addToCombo, showSparkles } = useStore();
+  const { combo, clearCombo, removeFromCombo, addToCombo, showSparkles } = useStore();
   const { reviewComboOrder } = useStoreDialogs();
   const [isDragOver, setIsDragOver] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -115,6 +115,11 @@ export default function ComboBar() {
                   </AnimatePresence>
                 )}
               </div>
+              {combo.length > 0 && (
+                <button type="button" onClick={clearCombo} className="min-h-[44px] text-xs text-muted hover:text-cream">
+                  Vaciar combo
+                </button>
+              )}
             </div>
           </div>
         </div>

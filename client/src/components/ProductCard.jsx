@@ -28,7 +28,7 @@ export default function ProductCard({ product }) {
   }, [isFlipped]);
 
   const isAvailable = product.available !== false;
-  const isInCombo = combo.some(item => item.id === product.id || item.name === product.name);
+  const isInCombo = combo.some(item => item.id === product.id);
   const monogram = getProductMonogram(product.name, product.monogram);
   const deliveryLabel = DELIVERY_TYPE_LABELS[product.delivery_type] || 'Perfil individual';
 

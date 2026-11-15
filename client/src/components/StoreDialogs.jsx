@@ -15,7 +15,7 @@ const deliveryNotes = {
 };
 
 export function StoreDialogsProvider({ children }) {
-  const { products, settings, combo, addToCombo } = useStore();
+  const { products, settings, combo, addToCombo, validateOrder } = useStore();
   const [dialog, setDialog] = useState(null);
   const openProductDetails = useCallback(product => setDialog({ view: 'details', product }), []);
   const reviewProductOrder = useCallback(product => setDialog({ view: 'product-order', product }), []);
@@ -23,20 +23,31 @@ export function StoreDialogsProvider({ children }) {
   const closeDialog = useCallback(() => setDialog(null), []);
   const actions = useMemo(() => ({ openProductDetails, reviewProductOrder, reviewComboOrder }), [openProductDetails, reviewProductOrder, reviewComboOrder]);
 
-  // Read existing store data; the dialog never creates a second cart or clears it.
   const selectedProduct = dialog?.product;
-  const product = selectedProduct && (products.find(item =>
-    (selectedProduct.id != null && item.id === selectedProduct.id) || item.name === selectedProduct.name
-  ) || selectedProduct);
-  const isDetails = dialog?.view === 'details';
+  const product = selectedProduct && products.find(item => item.id === selectedProduct.id && item.visible);
+  const isDetails = dialog?.view === 'details' && Boolean(product);
   const isComboOrder = dialog?.view === 'combo-order';
   const items = isComboOrder ? combo : product ? [product] : [];
   const total = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
-  const isInCombo = product && combo.some(item => item.id === product.id || item.name === product.name);
+  const isInCombo = product && combo.some(item => item.id === product.id);
   const benefitInfo = getProductBenefitInfo(product);
   const includes = Array.isArray(product?.includes) ? product.includes.filter(item => typeof item === 'string' && item.trim()) : [];
   const whatsappUrl = isComboOrder ? createComboWhatsAppUrl(settings?.whatsapp_number, items) : createProductWhatsAppUrl(settings?.whatsapp_number, product);
-  const canContinue = items.length > 0;
+  const [orderNotice, setOrderNotice] = useState(null);
+  const [checking, setChecking] = useState(false);
+  const canContinue = items.length > 0 && items.every(item => item.available) && Boolean(whatsappUrl);
+
+  const continueOrder = async () => {
+    setChecking(true);
+    setOrderNotice(null);
+    try {
+      const message = await validateOrder(items);
+      if (message) setOrderNotice({ dialog, message });
+      else window.location.assign(whatsappUrl);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   return (
     <DialogContext.Provider value={actions}>
@@ -55,9 +66,9 @@ export function StoreDialogsProvider({ children }) {
             <div className="space-y-3">
               <div className="flex flex-col-reverse sm:flex-row gap-2">
                 <button type="button" onClick={closeDialog} className={secondaryButton}><ArrowLeft className="w-4 h-4" />Seguir eligiendo</button>
-                <a href={canContinue ? whatsappUrl : undefined} target="_blank" rel="noopener noreferrer" aria-disabled={!canContinue} tabIndex={canContinue ? 0 : -1}
-                  className={`${primaryButton} sm:flex-1 ${canContinue ? '' : 'opacity-40 pointer-events-none'}`}><MessageCircle className="w-4 h-4" />Continuar en WhatsApp</a>
+                <button type="button" onClick={continueOrder} disabled={!canContinue || checking} className={`${primaryButton} sm:flex-1`}><MessageCircle className="w-4 h-4" />{checking ? 'Verificando…' : 'Continuar en WhatsApp'}</button>
               </div>
+              {orderNotice?.dialog === dialog && <p role="alert" className="text-xs text-muted">{orderNotice.message}</p>}
               <p className="text-[11px] text-muted text-center">Se abrirá WhatsApp con el pedido preparado para consultar disponibilidad y coordinar el pago.</p>
             </div>
           )}>

@@ -11,7 +11,7 @@ export default function StoreFeedback() {
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const same = (a, b) => a.id === b.id || a.name === b.name;
+    const same = (a, b) => a.id === b.id;
     const added = combo.filter(item => !previous.current.some(old => same(old, item)));
     const removed = previous.current.filter(item => !combo.some(current => same(current, item)));
     previous.current = combo;
