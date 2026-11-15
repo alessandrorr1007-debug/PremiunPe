@@ -3,14 +3,6 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const ADMIN_EMAIL = 'admin@premiumpe.com';
 
-// Credenciales autorizadas para acceso administrativo
-const LOCAL_CREDENTIALS = [
-  { username: 'cheridecheros', password: 'Pool', email: 'cheridecheros@premiumpe.com' },
-  { username: 'cheridecheros@premiumpe.com', password: 'Pool', email: 'cheridecheros@premiumpe.com' },
-  { username: 'admin@premiumpe.com', password: 'PremiumPe#2026!k9Q', email: ADMIN_EMAIL },
-  { username: 'admin', password: 'PremiumPe#2026!k9Q', email: ADMIN_EMAIL }
-];
-
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -19,13 +11,13 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 2. Si Supabase está configurado, escuchar cambios de sesión
+    // Supabase es la única fuente de autenticación administrativa
     if (isSupabaseConfigured() && supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-      });
+      }).catch(() => { setSession(null); setUser(null); setLoading(false); });
 
       const {
         data: { subscription },
@@ -37,23 +29,13 @@ export function AuthProvider({ children }) {
 
       return () => subscription.unsubscribe();
     } else {
-      // 1. Verificar si hay sesión demo guardada
-      const savedDemoUser = localStorage.getItem('premiumpe_demo_admin');
-      if (savedDemoUser) {
-        try {
-          setUser(JSON.parse(savedDemoUser));
-        } catch {
-          localStorage.removeItem('premiumpe_demo_admin');
-        }
-      }
-
+      localStorage.removeItem('premiumpe_demo_admin');
       setLoading(false);
     }
   }, []);
 
   const login = async (identifier, password) => {
     const trimmedId = (identifier || '').trim().toLowerCase();
-    const trimmedPass = (password || '').trim();
 
     if (isSupabaseConfigured() && supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -75,24 +57,7 @@ export function AuthProvider({ children }) {
       return data.user;
     }
 
-    // 1. Verificación directa contra credenciales locales
-    const matchedCred = LOCAL_CREDENTIALS.find(
-      (c) => c.username.toLowerCase() === trimmedId && c.password === trimmedPass
-    );
-
-    if (matchedCred) {
-      const adminUser = {
-        id: 'admin-cheridecheros',
-        email: matchedCred.email,
-        username: matchedCred.username,
-        user_metadata: { role: 'admin', name: 'Administrador' },
-      };
-      localStorage.setItem('premiumpe_demo_admin', JSON.stringify(adminUser));
-      setUser(adminUser);
-      return adminUser;
-    }
-
-    throw new Error('Credenciales incorrectas. Verifica tu usuario y contraseña.');
+    throw new Error('Supabase no está configurado en esta publicación. Contacta al administrador.');
   };
 
   const logout = async () => {
@@ -108,14 +73,7 @@ export function AuthProvider({ children }) {
     setSession(null);
   };
 
-  const isAdmin = supabase ? session?.user?.email === ADMIN_EMAIL : Boolean(
-    user && (
-      user.email === ADMIN_EMAIL ||
-      user.email === 'cheridecheros@premiumpe.com' ||
-      user.username === 'cheridecheros' ||
-      user.user_metadata?.role === 'admin'
-    )
-  );
+  const isAdmin = Boolean(supabase && session?.user?.email?.toLowerCase() === ADMIN_EMAIL);
 
   const value = {
     user,
