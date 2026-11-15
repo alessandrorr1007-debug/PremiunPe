@@ -11,7 +11,10 @@
     "dev:client": "npm --prefix client run dev",
     "dev:admin": "npm --prefix admin run dev",
     "build:client": "npm --prefix client run build",
-    "build:admin": "npm --prefix admin run build"
+    "build:admin": "npm --prefix admin run build",
+    "test:e2e": "playwright test",
+    "test:db": "node --test tests/rls.test.js",
+    "test:unit": "node --test tests/cart.test.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -23,10 +26,12 @@
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^7.18.5",
     "sonner": "^2.0.8"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.16",
+    "@playwright/test": "1.65.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",

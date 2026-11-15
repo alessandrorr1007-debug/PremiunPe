@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/dist
+**/dist-ssr
+**/.env*
+**/*.local
+**/*.log
+**/test-results
+**/playwright-report
+**/.npmrc
+**/dist-qa

@@ -8,9 +8,7 @@ Sitio web y catálogo de suscripciones digitales en Perú (Disney+, Canva Pro, C
 
 - **Ruta directa:** `/admin` o `/login`
 - **Desde la tienda:** Haz clic en el botón de configuración ⚙️ ubicado en la barra de navegación (header) o en el pie de página.
-- **Credenciales autorizadas:**
-  - **Usuario:** `cheridecheros`
-  - **Contraseña:** `cherigey`
+- **Cuenta:** usa un correo administrativo confirmado en Supabase Auth.
 
 Dentro del panel de administración podrás:
 - Crear, editar y eliminar productos.
@@ -52,3 +50,7 @@ npm run build
 # Probar la compilación localmente
 npm run preview
 ```
+
+## Pruebas de auditoría
+
+Usa Node.js 20 o posterior, o ejecuta `docker compose run --build --rm qa`. Consulta el [informe y los pasos de reproducción](docs/AUDITORIA_PREMIUMPE.md).

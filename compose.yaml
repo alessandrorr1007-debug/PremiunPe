@@ -1,0 +1,5 @@
+services:
+  qa:
+    build: .
+    init: true
+    shm_size: 1gb
