@@ -38,8 +38,9 @@ export default function AdminLoginModal({ isOpen, onClose }) {
       onClose();
       navigate('/admin');
     } catch (err) {
-      console.error(err);
-      setErrorMessage('Credenciales incorrectas. Verifica tu usuario y contraseña.');
+      console.error('Error de inicio de sesión:', err?.name || 'desconocido');
+      const message = (err?.message || '').toLowerCase();
+      setErrorMessage(message.includes('no está configurado') ? 'El servicio de autenticación no está configurado en esta publicación.' : message.includes('invalid login credentials') || message.includes('credenciales incorrectas') ? 'Usuario o contraseña incorrectos para la cuenta de Supabase.' : message.includes('failed to fetch') || message.includes('network') ? 'No se pudo conectar con Supabase. Comprueba tu conexión.' : message.includes('acceso denegado') ? 'Esta cuenta no tiene permisos administrativos.' : 'No fue posible iniciar sesión. Inténtalo de nuevo.');
     } finally {
       setSubmitting(false);
     }
