@@ -28,7 +28,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
     setErrorMessage('');
 
     if (!username.trim() || !password.trim()) {
-      setErrorMessage('Ingresa usuario y contraseña.');
+      setErrorMessage('Ingresa correo y contraseña.');
       return;
     }
 
@@ -39,7 +39,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
       navigate('/admin');
     } catch (err) {
       console.error(err);
-      setErrorMessage('Credenciales incorrectas. Verifica tu usuario y contraseña.');
+      setErrorMessage('Credenciales incorrectas. Verifica tu correo y contraseña.');
     } finally {
       setSubmitting(false);
     }
@@ -103,16 +103,17 @@ export default function AdminLoginModal({ isOpen, onClose }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-muted mb-1.5 text-left">
-                Usuario
+                Correo administrativo
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
-                  type="text"
+                  type="email"
+                  autoComplete="username"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Ingresa tu usuario"
+                  placeholder="Ingresa tu correo"
                   disabled={submitting}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-ink/[0.04] border border-borderCream text-cream placeholder-muted/60 text-xs sm:text-sm focus:outline-none focus:border-aji transition-all min-h-[44px]"
                 />

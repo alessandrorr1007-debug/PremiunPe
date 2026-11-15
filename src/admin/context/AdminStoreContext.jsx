@@ -31,13 +31,13 @@ export function AdminStoreProvider({ children }) {
         setProducts(data || []);
         setIsLive(true);
       } catch (err) {
-        console.warn('Error cargando productos de Supabase, usando fallback local:', err);
-        fallbackLocalProducts();
+        setIsLive(false);
+        showToast('No se pudieron cargar los productos de Supabase.', 'error');
       }
     } else {
       fallbackLocalProducts();
     }
-  }, []);
+  }, [showToast]);
 
   const fallbackLocalProducts = () => {
     const saved = localStorage.getItem('premiumpe_products');
@@ -67,13 +67,12 @@ export function AdminStoreProvider({ children }) {
           setSettings(data);
         }
       } catch (err) {
-        console.warn('Error cargando configuración de Supabase, usando fallback:', err);
-        fallbackLocalSettings();
+        showToast('No se pudo cargar la configuración de Supabase.', 'error');
       }
     } else {
       fallbackLocalSettings();
     }
-  }, []);
+  }, [showToast]);
 
   const fallbackLocalSettings = () => {
     const saved = localStorage.getItem('premiumpe_settings');
@@ -144,8 +143,8 @@ export function AdminStoreProvider({ children }) {
 
   // 1. Edición rápida de precio
   const quickUpdatePrice = async (id, newPrice) => {
-    const parsedPrice = parseFloat(newPrice);
-    if (isNaN(parsedPrice) || parsedPrice < 0) {
+    const parsedPrice = Number(newPrice);
+    if (String(newPrice ?? '').trim() === '' || !Number.isFinite(parsedPrice) || parsedPrice < 0 || parsedPrice > 99999999.99) {
       showToast('El precio debe ser un número válido y no negativo.', 'error');
       return false;
     }
@@ -155,7 +154,7 @@ export function AdminStoreProvider({ children }) {
         const { error } = await supabase
           .from('products')
           .update({ price: parsedPrice })
-          .eq('id', id);
+          .eq('id', id).select('id').single();
 
         if (error) throw error;
         showToast('Precio actualizado en Supabase.', 'success');
@@ -186,7 +185,7 @@ export function AdminStoreProvider({ children }) {
         const { error } = await supabase
           .from('products')
           .update({ available: nextStatus })
-          .eq('id', id);
+          .eq('id', id).select('id').single();
 
         if (error) throw error;
         showToast(`Marcado como ${nextStatus ? 'Disponible' : 'Agotado'}.`, 'success');
@@ -214,7 +213,7 @@ export function AdminStoreProvider({ children }) {
         const { error } = await supabase
           .from('products')
           .update({ visible: nextVisible })
-          .eq('id', id);
+          .eq('id', id).select('id').single();
 
         if (error) throw error;
         showToast(`Visibilidad ${nextVisible ? 'activada' : 'oculta'} en el catálogo.`, 'info');
@@ -242,7 +241,7 @@ export function AdminStoreProvider({ children }) {
         const { error } = await supabase
           .from('products')
           .update({ featured: nextFeatured })
-          .eq('id', id);
+          .eq('id', id).select('id').single();
 
         if (error) throw error;
         showToast(`Producto ${nextFeatured ? 'destacado' : 'normal'}.`, 'info');
@@ -261,6 +260,11 @@ export function AdminStoreProvider({ children }) {
 
   // 5. Crear
   const addProduct = async (productData) => {
+    const price = Number(productData.price);
+    if (!productData.name?.trim() || String(productData.price ?? '').trim() === '' ||
+        !Number.isFinite(price) || price < 0 || price > 99999999.99) {
+      throw new Error('Ingresa un nombre y un precio válido.');
+    }
     const cleanData = {
       name: productData.name.trim(),
       description: productData.description?.trim() || '',
@@ -268,7 +272,7 @@ export function AdminStoreProvider({ children }) {
       delivery_type: productData.delivery_type || 'perfil',
       includes: Array.isArray(productData.includes) ? productData.includes.slice(0, 3) : [],
       accent: productData.accent || 'aji',
-      price: parseFloat(productData.price) || 0,
+      price,
       image_url: productData.image_url?.trim() || '',
       available: productData.available ?? true,
       visible: productData.visible ?? true,
@@ -306,6 +310,11 @@ export function AdminStoreProvider({ children }) {
 
   // 6. Editar
   const updateProduct = async (id, productData) => {
+    const price = Number(productData.price);
+    if (!productData.name?.trim() || String(productData.price ?? '').trim() === '' ||
+        !Number.isFinite(price) || price < 0 || price > 99999999.99) {
+      throw new Error('Ingresa un nombre y un precio válido.');
+    }
     const cleanData = {
       name: productData.name.trim(),
       description: productData.description?.trim() || '',
@@ -313,7 +322,7 @@ export function AdminStoreProvider({ children }) {
       delivery_type: productData.delivery_type || 'perfil',
       includes: Array.isArray(productData.includes) ? productData.includes.slice(0, 3) : [],
       accent: productData.accent || 'aji',
-      price: parseFloat(productData.price) || 0,
+      price,
       image_url: productData.image_url?.trim() || '',
       available: productData.available ?? true,
       visible: productData.visible ?? true,
@@ -327,12 +336,12 @@ export function AdminStoreProvider({ children }) {
           .from('products')
           .update(cleanData)
           .eq('id', id)
-          .select();
+          .select().single();
 
         if (error) throw error;
         showToast('¡Producto actualizado con éxito!', 'success');
         await loadProducts();
-        return data?.[0];
+        return data;
       } catch (err) {
         showToast('Error al actualizar: ' + err.message, 'error');
         throw err;
@@ -354,7 +363,7 @@ export function AdminStoreProvider({ children }) {
         const { error } = await supabase
           .from('products')
           .delete()
-          .eq('id', id);
+          .eq('id', id).select('id').single();
 
         if (error) throw error;
         showToast('Producto eliminado.', 'info');
@@ -401,12 +410,16 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ available })
-          .in('id', ids);
+          .in('id', ids).select('id');
 
         if (error) throw error;
+        if (data.length !== new Set(ids).size) {
+          await loadProducts();
+          throw new Error('La operación no se aplicó a todos los productos.');
+        }
         showToast(`${ids.length} productos marcados como ${available ? 'Disponibles' : 'Agotados'}.`, 'success');
         await loadProducts();
       } catch (err) {
@@ -426,12 +439,16 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .update({ visible })
-          .in('id', ids);
+          .in('id', ids).select('id');
 
         if (error) throw error;
+        if (data.length !== new Set(ids).size) {
+          await loadProducts();
+          throw new Error('La operación no se aplicó a todos los productos.');
+        }
         showToast(`${ids.length} productos marcados como ${visible ? 'Visibles' : 'Ocultos'}.`, 'info');
         await loadProducts();
       } catch (err) {
@@ -451,12 +468,16 @@ export function AdminStoreProvider({ children }) {
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .delete()
-          .in('id', ids);
+          .in('id', ids).select('id');
 
         if (error) throw error;
+        if (data.length !== new Set(ids).size) {
+          await loadProducts();
+          throw new Error('La operación no se aplicó a todos los productos.');
+        }
         showToast(`${ids.length} productos eliminados con éxito.`, 'info');
         await loadProducts();
         return true;
@@ -472,53 +493,44 @@ export function AdminStoreProvider({ children }) {
     }
   };
 
-  // 7d. Reordenar productos (subir / bajar)
-  const reorderProduct = async (id, direction) => {
-    const index = products.findIndex((p) => p.id === id);
-    if (index === -1) return;
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= products.length) return;
+  const reorderAllProducts = async (orderedProducts) => {
+    const included = new Set(orderedProducts.map(product => product.id));
+    let next = 0;
+    const merged = products.map(product => included.has(product.id) ? orderedProducts[next++] : product);
+    const updated = merged.map((product, index) => ({ ...product, sort_order: index + 1 }));
 
-    const newProducts = [...products];
-    const temp = newProducts[index];
-    newProducts[index] = newProducts[targetIndex];
-    newProducts[targetIndex] = temp;
+    if (!isSupabaseConfigured() || !supabase) {
+      persistLocalProducts(updated);
+      return;
+    }
 
-    // Actualizar sort_order
-    const updatedWithOrder = newProducts.map((p, idx) => ({ ...p, sort_order: idx }));
-
-    if (isSupabaseConfigured() && supabase) {
-      try {
-        // Actualizar el sort_order de los dos intercambiados
-        await Promise.all([
-          supabase.from('products').update({ sort_order: index }).eq('id', newProducts[index].id),
-          supabase.from('products').update({ sort_order: targetIndex }).eq('id', newProducts[targetIndex].id),
-        ]);
-        await loadProducts();
-      } catch (err) {
-        console.warn('Error reordenando en Supabase:', err);
+    const previousOrders = new Map(products.map(product => [product.id, product.sort_order]));
+    const changed = updated.filter(product => previousOrders.get(product.id) !== product.sort_order);
+    try {
+      const results = await Promise.all(changed.map(product => supabase
+        .from('products')
+        .update({ sort_order: product.sort_order })
+        .eq('id', product.id)
+        .select('id')
+        .single()));
+      if (results.some(result => result.error)) {
+        showToast('No se pudo aplicar todo el orden. Revisa el catálogo actualizado.', 'error');
       }
-    } else {
-      persistLocalProducts(updatedWithOrder);
+    } catch {
+      showToast('No se pudo guardar el orden.', 'error');
+    } finally {
+      await loadProducts();
     }
   };
 
-  // 7e. Reordenar toda la lista (arrastrar y soltar)
-  const reorderAllProducts = async (newOrderedProducts) => {
-    const updatedWithOrder = newOrderedProducts.map((p, idx) => ({ ...p, sort_order: idx + 1 }));
-    setProducts(updatedWithOrder);
-    localStorage.setItem('premiumpe_products', JSON.stringify(updatedWithOrder));
+  const reorderProduct = async (id, direction) => {
+    const index = products.findIndex(product => product.id === id);
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (index === -1 || target < 0 || target >= products.length) return;
 
-    if (isSupabaseConfigured() && supabase) {
-      try {
-        const updates = updatedWithOrder.map((p) =>
-          supabase.from('products').update({ sort_order: p.sort_order }).eq('id', p.id)
-        );
-        await Promise.all(updates);
-      } catch (err) {
-        console.warn('Error guardando reordenamiento masivo en Supabase:', err);
-      }
-    }
+    const ordered = [...products];
+    [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
+    await reorderAllProducts(ordered);
   };
 
   // 8. Configuración
@@ -543,7 +555,7 @@ export function AdminStoreProvider({ children }) {
       try {
         const { error } = await supabase
           .from('settings')
-          .upsert(cleanSettings);
+          .upsert(cleanSettings).select('id').single();
 
         if (error) throw error;
         setSettings(cleanSettings);

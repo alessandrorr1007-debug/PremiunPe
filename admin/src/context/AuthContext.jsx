@@ -1,98 +1,75 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const ADMIN_EMAIL = 'admin@premiumpe.com';
-
 const AuthContext = createContext(null);
+const hasAdminIdentity = user => user?.email?.toLowerCase() === ADMIN_EMAIL &&
+  Boolean(user.email_confirmed_at);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(supabase));
 
   useEffect(() => {
-    if (isSupabaseConfigured() && supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    if (!supabase) return;
+    let revision = 0;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      const current = ++revision;
+      if (!nextSession) {
+        setSession(null);
         setLoading(false);
-      });
-
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      });
-
-      return () => subscription.unsubscribe();
-    } else {
-      const savedDemoUser = localStorage.getItem('premiumpe_demo_admin');
-      if (savedDemoUser) {
-        try {
-          setUser(JSON.parse(savedDemoUser));
-        } catch {
-          localStorage.removeItem('premiumpe_demo_admin');
-        }
+        return;
       }
-      setLoading(false);
-    }
+
+      // A stored browser session cannot authorize the panel until Auth verifies it.
+      setTimeout(async () => {
+        try {
+          const { data, error } = await supabase.auth.getUser(nextSession.access_token);
+          if (current === revision) {
+            setSession(!error && hasAdminIdentity(data.user) ? { ...nextSession, user: data.user } : null);
+          }
+        } catch {
+          if (current === revision) setSession(null);
+        } finally {
+          if (current === revision) setLoading(false);
+        }
+      }, 0);
+    });
+
+    return () => {
+      revision++;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email, password) => {
-    if (isSupabaseConfigured() && supabase) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
+    if (!supabase) throw new Error('El acceso administrativo requiere configurar Supabase.');
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
-      if (error) {
-        throw error;
-      }
-
-      if (data.user?.email !== ADMIN_EMAIL) {
-        await supabase.auth.signOut();
-        throw new Error(`Acceso denegado. Solo la cuenta ${ADMIN_EMAIL} tiene acceso administrativo.`);
-      }
-
-      setUser(data.user);
-      setSession(data.session);
-      return data.user;
+    if (error) throw new Error('No se pudo iniciar sesión.');
+    if (!hasAdminIdentity(data.user)) {
+      await supabase.auth.signOut({ scope: 'local' });
+      throw new Error('La cuenta no tiene acceso administrativo.');
     }
-
-    // Modo demostración local
-    if (email.trim().toLowerCase() === ADMIN_EMAIL && password === 'PremiumPe#2026!k9Q') {
-      const demoUser = {
-        id: 'demo-admin-id',
-        email: ADMIN_EMAIL,
-        user_metadata: { role: 'admin' },
-      };
-      localStorage.setItem('premiumpe_demo_admin', JSON.stringify(demoUser));
-      setUser(demoUser);
-      return demoUser;
-    } else {
-      throw new Error('Credenciales incorrectas o usuario no registrado.');
-    }
+    setSession(data.session);
+    return data.user;
   };
 
   const logout = async () => {
-    if (isSupabaseConfigured() && supabase) {
-      await supabase.auth.signOut();
-    }
-    localStorage.removeItem('premiumpe_demo_admin');
-    setUser(null);
     setSession(null);
+    await supabase?.auth.signOut({ scope: 'local' });
   };
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
-
+  const user = session?.user ?? null;
   const value = {
     user,
     session,
     loading,
-    isAdmin,
-    adminEmail: ADMIN_EMAIL,
+    isAdmin: hasAdminIdentity(user),
+    adminEmail: user?.email || ADMIN_EMAIL,
     isSupabaseActive: isSupabaseConfigured(),
     login,
     logout,
@@ -103,8 +80,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
-  }
+  if (!context) throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   return context;
 }

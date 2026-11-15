@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import AdminLayout from '../components/AdminLayout';
 import SummaryTab from '../components/dashboard/SummaryTab';
 import ProductsTab from '../components/products/ProductsTab';
 import SettingsTab from '../components/SettingsTab';
 import ProductDrawer from '../components/products/ProductDrawer';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
-import { useAdminStore } from '../context/AdminStoreContext';
+import { AdminStoreProvider, useAdminStore } from '../context/AdminStoreContext';
 
 export default function DashboardPage() {
+  const { isAdmin, loading } = useAuth();
+
+  if (loading) return <p role="status">Verificando credenciales administrativas…</p>;
+  if (!isAdmin) return <Navigate to="/login" replace />;
+  return <AdminStoreProvider><DashboardContent /></AdminStoreProvider>;
+}
+
+function DashboardContent() {
   const { 
     products, 
     settings,

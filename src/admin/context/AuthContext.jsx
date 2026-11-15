@@ -1,132 +1,74 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const ADMIN_EMAIL = 'admin@premiumpe.com';
-
-// Credenciales autorizadas para acceso administrativo
-const LOCAL_CREDENTIALS = [
-  { username: 'cheridecheros', password: 'cherigey', email: 'cheridecheros@premiumpe.com' },
-  { username: 'cheridecheros@premiumpe.com', password: 'cherigey', email: 'cheridecheros@premiumpe.com' },
-  { username: 'admin@premiumpe.com', password: 'PremiumPe#2026!k9Q', email: ADMIN_EMAIL },
-  { username: 'admin', password: 'PremiumPe#2026!k9Q', email: ADMIN_EMAIL }
-];
-
 const AuthContext = createContext(null);
+const hasAdminIdentity = user => user?.email?.toLowerCase() === ADMIN_EMAIL &&
+  Boolean(user.email_confirmed_at);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(supabase));
 
   useEffect(() => {
-    // 1. Verificar si hay sesión demo guardada
-    const savedDemoUser = localStorage.getItem('premiumpe_demo_admin');
-    if (savedDemoUser) {
-      try {
-        setUser(JSON.parse(savedDemoUser));
-      } catch {
-        localStorage.removeItem('premiumpe_demo_admin');
+    if (!supabase) return;
+    let revision = 0;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      const current = ++revision;
+      if (!nextSession) {
+        setSession(null);
+        setLoading(false);
+        return;
       }
-    }
 
-    // 2. Si Supabase está configurado, escuchar cambios de sesión
-    if (isSupabaseConfigured() && supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          setSession(session);
-          setUser(session?.user ?? null);
+      // A stored browser session cannot authorize the panel until Auth verifies it.
+      setTimeout(async () => {
+        try {
+          const { data, error } = await supabase.auth.getUser(nextSession.access_token);
+          if (current === revision) {
+            setSession(!error && hasAdminIdentity(data.user) ? { ...nextSession, user: data.user } : null);
+          }
+        } catch {
+          if (current === revision) setSession(null);
+        } finally {
+          if (current === revision) setLoading(false);
         }
-        setLoading(false);
-      });
+      }, 0);
+    });
 
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session) {
-          setSession(session);
-          setUser(session?.user ?? null);
-        }
-        setLoading(false);
-      });
-
-      return () => subscription.unsubscribe();
-    } else {
-      setLoading(false);
-    }
+    return () => {
+      revision++;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const login = async (identifier, password) => {
-    const trimmedId = (identifier || '').trim().toLowerCase();
-    const trimmedPass = (password || '').trim();
+  const login = async (email, password) => {
+    if (!supabase) throw new Error('El acceso administrativo requiere configurar Supabase.');
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
-    // 1. Verificación directa contra credenciales autorizadas (cheridecheros / cherigey)
-    const matchedCred = LOCAL_CREDENTIALS.find(
-      (c) => c.username.toLowerCase() === trimmedId && c.password === trimmedPass
-    );
-
-    if (matchedCred) {
-      const adminUser = {
-        id: 'admin-cheridecheros',
-        email: matchedCred.email,
-        username: matchedCred.username,
-        user_metadata: { role: 'admin', name: 'Administrador' },
-      };
-      localStorage.setItem('premiumpe_demo_admin', JSON.stringify(adminUser));
-      setUser(adminUser);
-      return adminUser;
+    if (error) throw new Error('No se pudo iniciar sesión.');
+    if (!hasAdminIdentity(data.user)) {
+      await supabase.auth.signOut({ scope: 'local' });
+      throw new Error('La cuenta no tiene acceso administrativo.');
     }
-
-    // 2. Si Supabase está conectado y se ingresó un correo
-    if (isSupabaseConfigured() && supabase && trimmedId.includes('@')) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmedId,
-        password: trimmedPass,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user?.email !== ADMIN_EMAIL && data.user?.email !== 'cheridecheros@premiumpe.com') {
-        await supabase.auth.signOut();
-        throw new Error(`Acceso denegado. La cuenta no cuenta con permisos administrativos.`);
-      }
-
-      setUser(data.user);
-      setSession(data.session);
-      return data.user;
-    }
-
-    throw new Error('Credenciales incorrectas. Verifica tu usuario y contraseña.');
+    setSession(data.session);
+    return data.user;
   };
 
   const logout = async () => {
-    if (isSupabaseConfigured() && supabase) {
-      try {
-        await supabase.auth.signOut();
-      } catch (err) {
-        console.warn('Error al desloguear de Supabase:', err);
-      }
-    }
-    localStorage.removeItem('premiumpe_demo_admin');
-    setUser(null);
     setSession(null);
+    await supabase?.auth.signOut({ scope: 'local' });
   };
 
-  const isAdmin = Boolean(
-    user && (
-      user.email === ADMIN_EMAIL ||
-      user.email === 'cheridecheros@premiumpe.com' ||
-      user.username === 'cheridecheros' ||
-      user.user_metadata?.role === 'admin'
-    )
-  );
-
+  const user = session?.user ?? null;
   const value = {
     user,
     session,
     loading,
-    isAdmin,
+    isAdmin: hasAdminIdentity(user),
     adminEmail: user?.email || ADMIN_EMAIL,
     isSupabaseActive: isSupabaseConfigured(),
     login,
@@ -138,8 +80,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
-  }
+  if (!context) throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   return context;
 }

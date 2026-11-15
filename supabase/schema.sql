@@ -3,9 +3,6 @@
 -- ==============================================================================
 -- Ejecuta este script en el SQL Editor de tu proyecto en Supabase (https://app.supabase.com)
 
--- 1. EXTENSIONES
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- 2. TABLA DE PRODUCTOS
 CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -138,13 +135,7 @@ VALUES (
         "facebook": "https://facebook.com/premiumpe"
     }'::jsonb
 )
-ON CONFLICT (id) DO UPDATE SET
-    whatsapp_number = EXCLUDED.whatsapp_number,
-    store_name = EXCLUDED.store_name,
-    hero_badge = EXCLUDED.hero_badge,
-    hero_title = EXCLUDED.hero_title,
-    hero_subtitle = EXCLUDED.hero_subtitle,
-    payment_methods = EXCLUDED.payment_methods;
+ON CONFLICT (id) DO NOTHING;
 
 -- 4. POLÍTICAS DE SEGURIDAD ROW LEVEL SECURITY (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -245,11 +236,9 @@ CREATE POLICY "Admin can delete product images"
         AND (auth.jwt() ->> 'email') = 'admin@premiumpe.com'
     );
 
--- 6. DATOS DE PRODUCTOS EXACTOS (Limpiando datos de ejemplo anteriores)
-DELETE FROM public.products;
-
+-- 6. Datos iniciales para un catálogo sin productos.
 INSERT INTO public.products (name, description, category, price, delivery_type, includes, accent, available, visible, featured, sort_order)
-VALUES
+SELECT * FROM (VALUES
     (
         'Disney+ Premium',
         'Películas, series y documentales para toda la familia en alta definición.',
@@ -353,4 +342,6 @@ VALUES
         true,
         true,
         8
-    );
+    )
+) AS seed(name, description, category, price, delivery_type, includes, accent, available, visible, featured, sort_order)
+WHERE NOT EXISTS (SELECT 1 FROM public.products);

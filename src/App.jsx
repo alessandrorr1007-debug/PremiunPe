@@ -1,16 +1,16 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './admin/context/AuthContext';
-import { AdminStoreProvider } from './admin/context/AdminStoreContext';
 import ClientStoreView from './client/App';
-import DashboardPage from './admin/pages/DashboardPage';
-import LoginPage from './admin/pages/LoginPage';
+
+const DashboardPage = lazy(() => import('./admin/pages/DashboardPage'));
+const LoginPage = lazy(() => import('./admin/pages/LoginPage'));
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AdminStoreProvider>
+        <Suspense fallback={<p role="status">Cargando…</p>}>
           <Routes>
             {/* 1. Ruta principal: Carga la tienda de clientes */}
             <Route path="/" element={<ClientStoreView />} />
@@ -26,7 +26,7 @@ export default function App() {
             {/* 4. Fallback a la tienda de clientes */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </AdminStoreProvider>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );
