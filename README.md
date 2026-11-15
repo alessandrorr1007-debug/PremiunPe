@@ -16,8 +16,8 @@ PremiumPe es una tienda peruana de suscripciones digitales con catálogo públic
 
 Abre `/login` o selecciona **Iniciar sesión** desde la tienda. 
 
-- **Usuario:** `cheridecheros`
-- **Contraseña:** `Pool`
+- **Usuario:** `cheridecheros` (alias de `admin@premiumpe.com`)
+- **Contraseña:** la contraseña privada configurada en Supabase Auth. No se almacena en el repositorio.
 
 En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. Usa **Ver Tienda** para regresar al catálogo.
 
@@ -46,4 +46,8 @@ Si usas Supabase, configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en Ne
 3. Configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` para producción en Netlify y vuelve a desplegar `main`.
 4. Inicia sesión, modifica un producto y comprueba el resultado en una ventana privada. La tienda actualiza el catálogo con Realtime y lo vuelve a consultar cada 30 segundos mientras está visible.
 
-Las credenciales del modo local solo sirven para el catálogo del navegador. La base compartida aplica permisos de lectura pública para productos visibles y escritura para la cuenta administradora autenticada.
+El acceso administrativo requiere Supabase Auth; no existe un modo local con contraseñas integradas. La base compartida aplica permisos de lectura pública para productos visibles y escritura para la cuenta administradora autenticada.
+
+## Cloudflare Workers (sitio estático)
+
+Configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en **Builds → Variables and secrets**, para Production. Ejecuta una compilación nueva (`npm run build`) después de cambiar variables; no son variables de runtime. La clave debe ser publicable, nunca `sb_secret_` ni `service_role`. El despliegue de archivos estáticos requiere que Wrangler publique `dist` como directorio de assets.
