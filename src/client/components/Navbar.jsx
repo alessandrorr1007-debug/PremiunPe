@@ -4,7 +4,6 @@ import { useStore } from '../context/StoreContext';
 import { useAuth } from '../../admin/context/AuthContext';
 import { Search, MessageCircle, Menu, X, Settings, Mountain, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ThemeToggle from './ThemeToggle';
 import { useStoreNavigation } from '../hooks/useStoreNavigation';
 import { formatWhatsAppNumber } from '../lib/mockData';
 import AdminLoginModal from './AdminLoginModal';
@@ -118,7 +117,6 @@ export default function Navbar() {
             }}>
               <ShoppingCart size={22} aria-hidden="true" /><span>{combo.length}</span>
             </a>
-            <div className="market-desktop-theme"><ThemeToggle /></div>
             {/* Gatillo de Paleta de Comandos (Ctrl+K) */}
             <button
               type="button"
@@ -233,7 +231,6 @@ export default function Navbar() {
                 <Settings className="w-4 h-4 text-aji" />
                 <span>Configuración y Administración</span>
               </button>
-              <div className="px-4 py-2"><ThemeToggle /></div>
             </nav>
           </motion.div>
         )}
