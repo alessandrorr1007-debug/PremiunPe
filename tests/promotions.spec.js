@@ -3,7 +3,9 @@ import { add, cart, catalog, count, mockStore, review } from './store-fixture.js
 
 async function mockPromotions(page) {
   const state = await mockStore(page);
-  const products = catalog.map(({ id, name, delivery_type }) => ({ id, name, delivery_type }));
+  const products = catalog.map(({ id, name, delivery_type }) => ({
+    id, name, delivery_type, image_url: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+  }));
   const offer = { id: 'qa-promo', name: 'Oferta Ámbar y Jade', price: 16.50, original_price: 21.75, products };
   let published = true;
   const headers = { 'access-control-allow-origin': '*' };
@@ -26,6 +28,15 @@ test('oferta antes del catálogo, cantidades persistidas y pedido mixto confirma
   const { state, offer } = await mockPromotions(page);
   await page.goto('/');
   const section = page.getByRole('region', { name: /Promociones especiales/ });
+  const covers = section.locator('img');
+  await expect(covers).toHaveCount(2);
+  expect(await covers.evaluateAll(images => {
+    const [left, right] = images.map(image => image.getBoundingClientRect());
+    return left.width > 0 && Math.abs(left.width - right.width) < 1 &&
+      Math.abs(left.right - right.left) < 1 && left.top === right.top;
+  })).toBe(true);
+  await expect(page.getByRole('button', { name: `Ver detalles de ${catalog[0].name}` })).toHaveText('');
+  await expect(page.getByRole('heading', { name: catalog[0].name, exact: true })).toBeVisible();
   await expect(section).toContainText(/Ahorras S\/ 5[.,]25 \(24 %\)/);
   expect(await section.evaluate(element =>
     Boolean(element.compareDocumentPosition(document.getElementById('catalogo')) & Node.DOCUMENT_POSITION_FOLLOWING)

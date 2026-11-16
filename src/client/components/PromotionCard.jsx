@@ -7,18 +7,19 @@ export default function PromotionCard({ offer, children }) {
   const original = Number(offer.original_price);
   const savings = Math.round((original - Number(offer.price)) * 100) / 100;
   const percent = original > 0 ? Math.round(savings / original * 100) : 0;
+  const splitCover = offer.products.length === 2;
 
   return (
     <article className="flex flex-col min-w-0 overflow-hidden rounded-2xl bg-surface border border-borderCream">
       {offer.image_url ? (
         <img className="w-full h-28 object-cover" src={offer.image_url} alt="" loading="lazy" />
       ) : (
-        <div className="flex flex-wrap items-center gap-2 p-4 bg-ink/5">
+        <div className={splitCover ? 'grid grid-cols-2 aspect-[1.65] bg-ink/5' : 'flex flex-wrap items-center gap-2 p-4 bg-ink/5'}>
           {offer.products.map(product => {
-            const image = product.image_url || productCover(product.name).cover;
+            const image = product.image_url?.trim() || productCover(product.name).cover;
             return (
-              <div key={product.id} className="w-11 h-11 rounded-lg overflow-hidden bg-surface flex items-center justify-center">
-                {image ? <img className="w-full h-full object-cover" src={image} alt="" loading="lazy" />
+              <div key={product.id} className={`overflow-hidden flex items-center justify-center ${splitCover ? 'relative min-w-0' : 'w-11 h-11 rounded-lg bg-surface'}`}>
+                {image ? <img className={`w-full h-full object-cover ${splitCover ? 'absolute inset-0' : ''}`} src={image} alt="" loading="lazy" />
                   : <Package className="w-5 h-5 text-muted" aria-hidden="true" />}
               </div>
             );

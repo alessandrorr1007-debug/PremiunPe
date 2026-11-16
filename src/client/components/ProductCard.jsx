@@ -22,7 +22,6 @@ export default function ProductCard({ product }) {
         {cover
           ? <img src={cover} alt="" loading="lazy" decoding="async" />
           : <CategoryIcon className="market-cover-icon" aria-hidden="true" />}
-        <span>{product.name}</span>
       </button>
       <div className="market-card-body">
         <h3>{product.name}</h3>
