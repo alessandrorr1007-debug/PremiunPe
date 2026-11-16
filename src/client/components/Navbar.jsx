@@ -96,7 +96,7 @@ export default function Navbar() {
               Preguntas
             </a>
             <a
-              href="https://devcodepee.netlify.app/"
+              href="https://devcodepe.netlify.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
