@@ -11,8 +11,7 @@ test('un usuario de demo falsificado no abre el panel', async ({ page }) => {
   await expect(page.getByRole('button', { name: /iniciar sesión/i })).toBeVisible();
 });
 
-test('sesión administrativa verificada, CRUD aislado y cierre de sesión', async ({ page }) => {
-  const state = await mockStore(page);
+async function mockAdminAuth(page) {
   const user = {
     id: '00000000-0000-4000-8000-000000000001',
     email: 'admin@premiumpe.com',
@@ -33,6 +32,20 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
     if (path.endsWith('/logout')) return route.fulfill({ headers, status: 204 });
     return route.fallback();
   });
+
+  return async () => {
+    await page.goto('/login');
+    await page.getByPlaceholder('Ingresa tu usuario o correo').fill(user.email);
+    await page.locator('input[type=password]').fill('isolated-test-password');
+    await page.getByRole('button', { name: /iniciar sesión/i }).click();
+    await expect(page).toHaveURL(/\/admin$/);
+  };
+}
+
+test('sesión administrativa verificada, CRUD aislado y cierre de sesión', async ({ page }) => {
+  const state = await mockStore(page);
+  const login = await mockAdminAuth(page);
+  const headers = { 'access-control-allow-origin': '*' };
   await page.route('https://premiumpe-qa.invalid/rest/v1/products**', route => {
     const request = route.request();
     const method = request.method();
@@ -54,11 +67,7 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
     return route.fallback();
   });
 
-  await page.goto('/login');
-  await page.getByPlaceholder('Ingresa tu usuario o correo').fill(user.email);
-  await page.locator('input[type=password]').fill('isolated-test-password');
-  await page.getByRole('button', { name: /iniciar sesión/i }).click();
-  await expect(page).toHaveURL(/\/admin$/);
+  await login();
   await page.getByRole('button', { name: /^Productos/ }).click();
   await page.getByRole('button', { name: /^Nuevo Producto/ }).click();
   await page.getByPlaceholder('ej. Disney+ Premium').fill('Servicio creado en QA');
@@ -90,4 +99,53 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   await expect(page).toHaveURL(/\/login$/);
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Servicio editado en QA', exact: true })).toHaveCount(0);
+});
+
+test('Configuración permite editar, previsualizar, activar, pausar y eliminar una promoción', async ({ page }) => {
+  await mockStore(page);
+  const login = await mockAdminAuth(page);
+  const headers = { 'access-control-allow-origin': '*' };
+  let saved;
+  await page.route('https://premiumpe-qa.invalid/rest/v1/promotions?**', route => {
+    const method = route.request().method();
+    if (method === 'GET') return route.fulfill({ headers, json: saved ? [saved] : [] });
+    const id = saved.id;
+    if (method === 'PATCH') Object.assign(saved, route.request().postDataJSON());
+    if (method === 'DELETE') saved = undefined;
+    return route.fulfill({ headers, json: { id } });
+  });
+  await page.route('https://premiumpe-qa.invalid/rest/v1/rpc/save_promotion', route => {
+    const { p_id, p_details, p_products } = route.request().postDataJSON();
+    saved = { ...p_details, product_ids: p_products, id: p_id ?? 'qa-promo' };
+    return route.fulfill({ headers, json: saved.id });
+  });
+
+  await login();
+  await page.getByRole('button', { name: /^(Configuración|Ajustes)/ }).filter({ visible: true }).click();
+  const section = page.getByRole('region', { name: 'Promociones' });
+  await section.getByRole('button', { name: 'Nueva promoción' }).click();
+  await section.getByLabel('Nombre del combo').fill('Oferta QA');
+  await section.getByLabel('Precio promocional (PEN)').fill('15.50');
+  await section.getByLabel('Descripción (opcional)').fill('Incluye dos servicios.');
+  await section.getByLabel(/Inicio \(opcional/).fill('2025-11-15T10:30');
+  await section.getByRole('checkbox', { name: /Servicio Ámbar/ }).check();
+  await section.getByRole('checkbox', { name: /Servicio Jade/ }).check();
+  await section.getByRole('button', { name: 'Ver vista previa' }).click();
+  await expect(section.getByRole('article')).toContainText(/Ahorras S\/ 6[.,]25/);
+  await section.getByRole('button', { name: 'Guardar promoción' }).click();
+  await expect(section.getByText(/Inactiva/)).toBeVisible();
+  expect(saved.product_ids).toEqual(['qa-1', 'qa-2']);
+  expect(saved.starts_at).toBe('2025-11-15T15:30:00.000Z');
+  await section.getByRole('button', { name: 'Editar', exact: true }).click();
+  await expect(section.getByLabel(/Inicio \(opcional/)).toHaveValue('2025-11-15T10:30');
+  await section.getByLabel('Precio promocional (PEN)').fill('14');
+  await section.getByRole('checkbox', { name: 'Activar promoción' }).check();
+  await section.getByRole('button', { name: 'Guardar promoción' }).click();
+  await expect(section.getByText(/Publicada/)).toBeVisible();
+  expect(saved.price).toBe(14);
+  await section.getByRole('button', { name: 'Desactivar' }).click();
+  await expect(section.getByText(/Inactiva/)).toBeVisible();
+  await section.getByRole('button', { name: 'Eliminar', exact: true }).click();
+  await section.getByRole('button', { name: 'Confirmar eliminación' }).click();
+  await expect(section.getByText('Todavía no hay promociones.')).toBeVisible();
 });

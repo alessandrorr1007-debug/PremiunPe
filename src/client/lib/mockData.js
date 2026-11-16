@@ -1,3 +1,5 @@
+import { cartTotal, lineTotal } from './cart.js';
+
 // Datos iniciales y fallback para la tienda pública de clientes
 
 export const DEFAULT_SETTINGS = {
@@ -260,9 +262,11 @@ export function createComboWhatsAppUrl(phone, comboItems) {
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola, me interesa armar un combo.')}`;
   }
   const summary = comboItems
-    .map(item => `${item.name} (S/ ${formatPriceNumber(item.price)})`)
+    .map(item => item.kind === 'promotion'
+      ? `${item.quantity} × ${item.name} [${item.products.map(product => product.name).join(', ')}] (S/ ${formatPriceNumber(lineTotal(item))})`
+      : `${item.name} (S/ ${formatPriceNumber(item.price)})`)
     .join(' + ');
-  const total = comboItems.reduce((acc, curr) => acc + Number(curr.price || 0), 0);
+  const total = cartTotal(comboItems);
   const totalStr = formatPriceNumber(total);
   const message = `Hola, quiero este combo: ${summary}. Total: S/ ${totalStr} al mes. ¿Está disponible?`;
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;

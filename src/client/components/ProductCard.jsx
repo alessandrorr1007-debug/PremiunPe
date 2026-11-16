@@ -3,13 +3,7 @@ import { Check, Clapperboard, LayoutGrid, Paintbrush, Plus, ShoppingCart, Sparkl
 import { useStore } from '../context/StoreContext';
 import { useStoreDialogs } from './StoreDialogs';
 import { formatPriceNumber } from '../lib/mockData';
-
-const covers = import.meta.glob('../assets/covers/*.webp', {
-  eager: true,
-  import: 'default',
-});
-
-const serviceBrands = ['disney', 'hbo', 'vix', 'prime', 'canva', 'office', 'gemini', 'chatgpt'];
+import { productCover } from '../lib/productCovers';
 const categoryIcons = { Streaming: Clapperboard, Herramientas: Paintbrush, IA: Sparkles };
 
 export default function ProductCard({ product }) {
@@ -17,9 +11,7 @@ export default function ProductCard({ product }) {
   const { openProductDetails, reviewProductOrder } = useStoreDialogs();
   const available = product.available !== false;
   const inCombo = combo.some(item => item.id === product.id);
-  const name = product.name.toLowerCase();
-  const brand = serviceBrands.find(service => name.includes(service));
-  const cover = covers[`../assets/covers/${brand}.webp`];
+  const { brand, cover } = productCover(product.name);
   const CategoryIcon = categoryIcons[product.category] || LayoutGrid;
 
   return (

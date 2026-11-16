@@ -19,7 +19,7 @@ Abre `/login` o selecciona **Iniciar sesión** desde la tienda.
 - **Usuario:** `cheridecheros` (alias de `admin@premiumpe.com`)
 - **Contraseña:** la contraseña privada configurada en Supabase Auth. No se almacena en el repositorio.
 
-En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. Usa **Ver Tienda** para regresar al catálogo.
+En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. En **Configuración → Promociones**, selecciona al menos dos productos, fija un precio en soles y revisa la vista previa. Guarda el combo con **Activar promoción** marcado para publicarlo durante las fechas que indiques (hora de Perú). Usa **Ver Tienda** para regresar al catálogo.
 
 ## Desarrollo local
 
@@ -41,7 +41,7 @@ Si usas Supabase, configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en Ne
 
 ## Catálogo compartido
 
-1. Ejecuta `supabase/schema.sql` en el proyecto de Supabase. Para un catálogo nuevo, usa `supabase/seed.sql` si quieres cargar los productos de ejemplo. Las ediciones que existan en el navegador del administrador deben trasladarse al catálogo compartido antes de darlo por listo.
+1. En un proyecto nuevo, ejecuta `supabase/schema.sql` antes de aplicar las migraciones de `supabase/migrations`. Si el catálogo ya está configurado, aplica solo las migraciones pendientes antes de desplegar la aplicación. Usa `supabase/seed.sql` si quieres cargar productos de ejemplo en un catálogo nuevo.
 2. Crea el usuario `admin@premiumpe.com` en Supabase Auth con una contraseña privada. El panel acepta también el nombre de usuario local como alias en modo conectado.
 3. Configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` para producción en Netlify y vuelve a desplegar `main`.
 4. Inicia sesión, modifica un producto y comprueba el resultado en una ventana privada. La tienda actualiza el catálogo con Realtime y lo vuelve a consultar cada 30 segundos mientras está visible.

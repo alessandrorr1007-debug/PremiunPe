@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { INITIAL_PRODUCTS, DEFAULT_SETTINGS } from '../lib/mockData';
-import { COMBO_STORAGE_KEY, LEGACY_COMBO_KEY, canBuy, readCombo } from '../lib/cart';
+import {
+  COMBO_STORAGE_KEY, LEGACY_COMBO_KEY, PROMOTION_CART_KEY, canBuy, matchesQuote, readCombo, readPromotionCart
+} from '../lib/cart';
 
 const StoreContext = createContext(null);
 const liveCatalog = Boolean(supabase && isSupabaseConfigured());
@@ -51,10 +53,22 @@ export function StoreProvider({ children }) {
     }
   });
   const pendingCatalog = useRef(null);
+  const pendingPromotions = useRef(null);
+  const [promotions, setPromotions] = useState([]);
+  const [promotionCart, setPromotionCart] = useState(() => {
+    try {
+      return readPromotionCart(window.localStorage);
+    } catch {
+      return new Map();
+    }
+  });
   const combo = useMemo(() => {
     const current = new Map(products.filter(canBuy).map(product => [product.id, product]));
-    return comboIds.map(id => current.get(id)).filter(Boolean);
-  }, [comboIds, products]);
+    const offers = promotions.filter(offer => promotionCart.has(offer.id)).map(offer => ({
+      ...offer, kind: 'promotion', available: true, quantity: promotionCart.get(offer.id)
+    }));
+    return [...comboIds.map(id => current.get(id)).filter(Boolean), ...offers];
+  }, [comboIds, products, promotions, promotionCart]);
 
   useEffect(() => {
     try {
@@ -64,6 +78,14 @@ export function StoreProvider({ children }) {
       // In private or restricted storage the current selection still works.
     }
   }, [comboIds]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(PROMOTION_CART_KEY, JSON.stringify([...promotionCart]));
+    } catch {
+      // The current selection still works without storage.
+    }
+  }, [promotionCart]);
 
   useEffect(() => {
     if (loading || error) return;
@@ -170,17 +192,54 @@ export function StoreProvider({ children }) {
     }
   }, []);
 
+  const loadPromotions = useCallback(async () => {
+    if (!liveCatalog) return;
+    if (pendingPromotions.current) return pendingPromotions.current;
+    const request = (async () => {
+      try {
+        const { data, error: requestError } = await supabase.from('current_promotions')
+          .select('*').order('name').order('id').abortSignal(AbortSignal.timeout(10000));
+        if (requestError) throw requestError;
+        setPromotions(data);
+        setPromotionCart(cart => {
+          const available = new Set(data.map(offer => offer.id));
+          const valid = [...cart].filter(([id]) => available.has(id));
+          return valid.length === cart.size ? cart : new Map(valid);
+        });
+      } catch {
+        setPromotions([]);
+      } finally {
+        pendingPromotions.current = null;
+      }
+    })();
+    pendingPromotions.current = request;
+    return request;
+  }, []);
+
+  useEffect(() => {
+    const deadlines = promotions.filter(offer => offer.ends_at).map(offer => Date.parse(offer.ends_at));
+    if (!deadlines.length) return;
+    const delay = Math.max(0, Math.min(...deadlines) - Date.now());
+    if (delay > 30000) return;
+    const timer = window.setTimeout(() => {
+      setPromotions(offers => offers.filter(offer => !offer.ends_at || Date.parse(offer.ends_at) > Date.now()));
+      loadPromotions();
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [loadPromotions, promotions]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
+      loadPromotions();
       await Promise.all([loadProducts(), loadSettings()]);
     } catch (err) {
       setError(err.message || 'Error cargando datos de la tienda');
     } finally {
       setLoading(false);
     }
-  }, [loadProducts, loadSettings]);
+  }, [loadProducts, loadSettings, loadPromotions]);
 
   useEffect(() => {
     fetchData();
@@ -191,6 +250,7 @@ export function StoreProvider({ children }) {
         if (document.visibilityState === 'hidden') return;
         loadProducts();
         loadSettings();
+        loadPromotions();
       };
       const channel = supabase
         .channel('public-store-sync')
@@ -199,6 +259,7 @@ export function StoreProvider({ children }) {
           { event: '*', schema: 'public', table: 'products' },
           () => {
             loadProducts();
+            loadPromotions();
           }
         )
         .on(
@@ -221,7 +282,7 @@ export function StoreProvider({ children }) {
         supabase.removeChannel(channel);
       };
     }
-  }, [fetchData, loadProducts, loadSettings]);
+  }, [fetchData, loadProducts, loadSettings, loadPromotions]);
 
   const addToCombo = useCallback((product) => {
     const current = products.find(item => item.id === product?.id);
@@ -246,9 +307,36 @@ export function StoreProvider({ children }) {
     setComboIds(ids => ids.filter(item => item !== id));
   }, []);
 
-  const clearCombo = useCallback(() => setComboIds([]), []);
+  const setPromotionQuantity = useCallback((id, quantity) => {
+    setPromotionCart(cart => {
+      const next = new Map(cart);
+      if (quantity === 0) next.delete(id);
+      else next.set(id, Math.min(99, Math.max(1, quantity)));
+      return next;
+    });
+  }, []);
+
+  const clearCombo = useCallback(() => {
+    setComboIds([]);
+    setPromotionCart(new Map());
+  }, []);
 
   const validateOrder = async (items) => {
+    if (items.some(item => item.kind === 'promotion')) {
+      try {
+        const { data, error: quoteError } = await supabase.rpc('quote_promotion_order', {
+          p_lines: items.map(item => ({ id: item.id, kind: item.kind ?? 'product', quantity: item.quantity ?? 1 }))
+        }).abortSignal(AbortSignal.timeout(10000));
+        if (quoteError) throw quoteError;
+        if (Array.isArray(data) && data.length === items.length && items.every((item, index) => matchesQuote(item, data[index]))) {
+          return { quote: data };
+        }
+        await Promise.all([loadProducts(), loadPromotions()]);
+        return 'El precio, el contenido o la disponibilidad cambió. Revisa el pedido actualizado.';
+      } catch {
+        return 'No pudimos verificar el pedido. Intenta nuevamente.';
+      }
+    }
     const current = liveCatalog ? await loadProducts() : products;
     if (!current) return 'No pudimos verificar el pedido. Intenta nuevamente.';
     for (const item of items) {
@@ -263,6 +351,9 @@ export function StoreProvider({ children }) {
 
   const value = {
     products,
+    promotions,
+    promotionCart,
+    setPromotionQuantity,
     settings,
     loading,
     error,

@@ -17,6 +17,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import { toast } from 'sonner';
+import PromotionsSettings from './PromotionsSettings';
 
 export default function SettingsTab() {
   const { settings, updateSettings } = useAdminStore();
@@ -183,6 +184,8 @@ export default function SettingsTab() {
           </div>
         )}
       </div>
+
+      <PromotionsSettings />
 
       <form onSubmit={handleSubmit} className="space-y-6 text-sm">
         {/* SECCIÓN 1: DATOS DE LA TIENDA Y WHATSAPP */}

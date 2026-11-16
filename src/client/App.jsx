@@ -8,6 +8,7 @@ import { StoreDialogsProvider } from './components/StoreDialogs';
 import { MotionConfig } from 'framer-motion';
 import Hero from './components/Hero';
 import Catalog from './components/Catalog';
+import Promotions from './components/Promotions';
 import HowToBuy from './components/HowToBuy';
 import WhyUs from './components/WhyUs';
 import FAQ from './components/FAQ';
@@ -30,6 +31,7 @@ export default function ClientStoreView() {
         <main className="store-main flex-1">
           {/* Portada */}
           <Hero />
+          <Promotions />
 
           {/* Catálogo */}
           <Catalog />

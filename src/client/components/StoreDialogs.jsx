@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import { Check, MessageCircle, Plus, ArrowLeft, Package } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { DELIVERY_TYPE_LABELS, formatPriceNumber, createComboWhatsAppUrl, createProductWhatsAppUrl } from '../lib/mockData';
+import { cartTotal, lineTotal, matchesQuote } from '../lib/cart';
 import StoreDialog from './StoreDialog';
 import { BENEFITS_REVIEWED_AT, getProductBenefitInfo } from '../content/productBenefits';
 
@@ -18,8 +19,8 @@ export function StoreDialogsProvider({ children }) {
   const { products, settings, combo, addToCombo, validateOrder } = useStore();
   const [dialog, setDialog] = useState(null);
   const openProductDetails = useCallback(product => setDialog({ view: 'details', product }), []);
-  const reviewProductOrder = useCallback(product => setDialog({ view: 'product-order', product }), []);
-  const reviewComboOrder = useCallback(() => setDialog({ view: 'combo-order' }), []);
+  const reviewProductOrder = useCallback(product => setDialog({ view: 'product-order', product, reviewed: [product] }), []);
+  const reviewComboOrder = useCallback(() => setDialog({ view: 'combo-order', reviewed: combo }), [combo]);
   const closeDialog = useCallback(() => setDialog(null), []);
   const actions = useMemo(() => ({ openProductDetails, reviewProductOrder, reviewComboOrder }), [openProductDetails, reviewProductOrder, reviewComboOrder]);
 
@@ -28,22 +29,28 @@ export function StoreDialogsProvider({ children }) {
   const isDetails = dialog?.view === 'details' && Boolean(product);
   const isComboOrder = dialog?.view === 'combo-order';
   const items = isComboOrder ? combo : product ? [product] : [];
-  const total = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const total = cartTotal(items);
   const isInCombo = product && combo.some(item => item.id === product.id);
   const benefitInfo = getProductBenefitInfo(product);
   const includes = Array.isArray(product?.includes) ? product.includes.filter(item => typeof item === 'string' && item.trim()) : [];
   const whatsappUrl = isComboOrder ? createComboWhatsAppUrl(settings?.whatsapp_number, items) : createProductWhatsAppUrl(settings?.whatsapp_number, product);
   const [orderNotice, setOrderNotice] = useState(null);
   const [checking, setChecking] = useState(false);
+  const reviewed = dialog?.reviewed;
+  const updated = reviewed && (items.length !== reviewed.length ||
+    !reviewed.every((item, index) => matchesQuote(item, items[index]) && item.available === items[index].available));
+  const notice = orderNotice?.dialog === dialog ? orderNotice?.message :
+    updated ? 'Tu pedido se actualizó. Revisa el nuevo resumen antes de continuar.' : null;
   const canContinue = items.length > 0 && items.every(item => item.available) && Boolean(whatsappUrl);
 
   const continueOrder = async () => {
     setChecking(true);
     setOrderNotice(null);
     try {
-      const message = await validateOrder(items);
-      if (message) setOrderNotice({ dialog, message });
-      else window.location.assign(whatsappUrl);
+      const result = await validateOrder(items);
+      if (typeof result === 'string') setOrderNotice({ dialog, message: result });
+      else window.location.assign(result?.quote
+        ? createComboWhatsAppUrl(settings?.whatsapp_number, result.quote) : whatsappUrl);
     } finally {
       setChecking(false);
     }
@@ -68,7 +75,7 @@ export function StoreDialogsProvider({ children }) {
                 <button type="button" onClick={closeDialog} className={secondaryButton}><ArrowLeft className="w-4 h-4" />Seguir eligiendo</button>
                 <button type="button" onClick={continueOrder} disabled={!canContinue || checking} className={`${primaryButton} sm:flex-1`}><MessageCircle className="w-4 h-4" />{checking ? 'Verificando…' : 'Continuar en WhatsApp'}</button>
               </div>
-              {orderNotice?.dialog === dialog && <p role="alert" className="text-xs text-muted">{orderNotice.message}</p>}
+              {notice && <p role="alert" className="text-xs text-muted">{notice}</p>}
               <p className="text-[11px] text-muted text-center">Se abrirá WhatsApp con el pedido preparado para consultar disponibilidad y coordinar el pago.</p>
             </div>
           )}>
@@ -117,9 +124,17 @@ export function StoreDialogsProvider({ children }) {
           ) : (
             <>
               {items.length ? <ul className="divide-y divide-borderCream">{items.map((item, index) => (
-                <li key={item.id || `${item.name}-${index}`} className="flex items-start justify-between gap-4 py-4 first:pt-0">
-                  <div className="min-w-0"><h3 className="font-medium text-sm break-words">{item.name}</h3><p className="text-xs text-muted mt-1">{DELIVERY_TYPE_LABELS[item.delivery_type] || 'Modalidad por confirmar'}</p></div>
-                  <p className="text-sm font-semibold tabular-nums shrink-0">S/ {formatPriceNumber(item.price)}<span className="block text-[11px] text-muted font-normal text-right">/mes</span></p>
+                <li key={`${item.kind ?? 'product'}:${item.id ?? index}`} className="flex items-start justify-between gap-4 py-4 first:pt-0">
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-sm break-words">{item.name}</h3>
+                    {item.kind === 'promotion' ? (
+                      <div className="text-xs text-muted mt-1 break-words">
+                        <p>{item.quantity} × S/ {formatPriceNumber(item.price)}</p>
+                        <ul className="list-disc pl-4">{item.products.map(included => <li key={included.id}>{included.name}</li>)}</ul>
+                      </div>
+                    ) : <p className="text-xs text-muted mt-1">{DELIVERY_TYPE_LABELS[item.delivery_type] || 'Modalidad por confirmar'}</p>}
+                  </div>
+                  <p className="text-sm font-semibold tabular-nums shrink-0">S/ {formatPriceNumber(lineTotal(item))}<span className="block text-[11px] text-muted font-normal text-right">/mes</span></p>
                 </li>
               ))}</ul> : <div className="text-center py-6"><Package className="w-8 h-8 text-muted mx-auto mb-3" /><p className="text-sm">Tu combo está vacío.</p><p className="text-xs text-muted mt-2">Vuelve al catálogo para elegir tus servicios.</p></div>}
               <div className="rounded-2xl bg-ink/[0.04] border border-borderCream p-4 flex items-center justify-between gap-4" aria-live="polite" aria-atomic="true">

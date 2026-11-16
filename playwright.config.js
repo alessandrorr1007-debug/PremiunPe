@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const mobileTests = '**/{responsive,social-links}.spec.js';
+const mobileTests = '**/{responsive,social-links,promotions}.spec.js';
 
 export default defineConfig({
   testDir: './tests',

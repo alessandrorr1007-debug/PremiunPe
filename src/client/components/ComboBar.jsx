@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useStore } from '../context/StoreContext';
-import { Layers, Send, Sparkles, X, ChevronDown } from 'lucide-react';
+import { Layers, Send, Sparkles, X, ChevronDown, Minus, Plus } from 'lucide-react';
 import { useStoreDialogs } from './StoreDialogs';
 import { formatPriceNumber } from '../lib/mockData';
+import { cartTotal, lineTotal } from '../lib/cart';
 
 export default function ComboBar() {
-  const { combo, clearCombo, removeFromCombo, addToCombo, showSparkles } = useStore();
+  const { combo, clearCombo, removeFromCombo, addToCombo, setPromotionQuantity, showSparkles } = useStore();
   const { reviewComboOrder } = useStoreDialogs();
   const [isDragOver, setIsDragOver] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -33,7 +34,7 @@ export default function ComboBar() {
   }, []);
 
   // Total acumulado mensual
-  const total = combo.reduce((acc, curr) => acc + Number(curr.price || 0), 0);
+  const total = cartTotal(combo);
   const totalFormatted = formatPriceNumber(total);
 
 
@@ -99,13 +100,29 @@ export default function ComboBar() {
                   <AnimatePresence initial={false}>
                     {combo.map(item => {
                       const accentStyles = getChipAccentBorder(item.accent);
+                      const isPromotion = item.kind === 'promotion';
                       return (
-                        <motion.span key={item.id || item.name} layout={!reduceMotion} initial={{ scale: reduceMotion ? 1 : 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: reduceMotion ? 1 : 0.95, opacity: 0 }}
-                          className={`inline-flex max-w-full items-center gap-1.5 pl-3 pr-1 min-h-[44px] rounded-xl bg-ink/[0.06] border text-cream text-xs font-medium ${accentStyles.split(' ')[0]}`}>
+                        <motion.span key={`${item.kind ?? 'product'}:${item.id}`} layout={!reduceMotion} initial={{ scale: reduceMotion ? 1 : 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: reduceMotion ? 1 : 0.95, opacity: 0 }}
+                          className={`inline-flex ${isPromotion ? 'flex-wrap' : ''} max-w-full items-center gap-1.5 pl-3 pr-1 min-h-[44px] rounded-xl bg-ink/[0.06] border text-cream text-xs font-medium ${accentStyles.split(' ')[0]}`}>
                           <span className={`w-2 h-2 rounded-full shrink-0 ${accentStyles.split(' ')[2]}`} />
                           <span className="min-w-0 truncate">{item.name}</span>
-                          <span className="text-muted text-[11px] shrink-0">S/ {formatPriceNumber(item.price)}</span>
-                          <button type="button" onClick={() => removeFromCombo(item.id || item.name)} aria-label={`Eliminar ${item.name} del combo`}
+                          <span className="text-muted text-[11px] shrink-0">S/ {formatPriceNumber(lineTotal(item))}</span>
+                          {isPromotion && (
+                            <span className="inline-flex items-center gap-1">
+                              <button type="button" aria-label={`Reducir cantidad de ${item.name}`}
+                                className="min-w-11 min-h-11 grid place-items-center rounded-lg hover:bg-ink/5 disabled:opacity-50"
+                                disabled={item.quantity === 1} onClick={() => setPromotionQuantity(item.id, item.quantity - 1)}>
+                                <Minus size={14} />
+                              </button>
+                              <span aria-label="Cantidad" aria-live="polite">{item.quantity}</span>
+                              <button type="button" aria-label={`Aumentar cantidad de ${item.name}`}
+                                className="min-w-11 min-h-11 grid place-items-center rounded-lg hover:bg-ink/5 disabled:opacity-50"
+                                disabled={item.quantity === 99} onClick={() => setPromotionQuantity(item.id, item.quantity + 1)}>
+                                <Plus size={14} />
+                              </button>
+                            </span>
+                          )}
+                          <button type="button" onClick={() => isPromotion ? setPromotionQuantity(item.id, 0) : removeFromCombo(item.id)} aria-label={`Eliminar ${item.name} del combo`}
                             className="text-muted hover:text-rocoto shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-ink/5 transition-colors">
                             <X className="w-3.5 h-3.5" />
                           </button>
