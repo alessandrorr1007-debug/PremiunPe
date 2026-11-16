@@ -2,12 +2,13 @@ import React from 'react';
 import { Check, Clapperboard, LayoutGrid, Paintbrush, Plus, ShoppingCart, Sparkles } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useStoreDialogs } from './StoreDialogs';
-import { formatPriceNumber } from '../lib/mockData';
+import { useStoreCurrency } from '../context/StoreCurrency';
 import { productCover } from '../lib/productCovers';
 const categoryIcons = { Streaming: Clapperboard, Herramientas: Paintbrush, IA: Sparkles };
 
 export default function ProductCard({ product }) {
   const { addToCombo, combo } = useStore();
+  const { formatPrice } = useStoreCurrency();
   const { openProductDetails, reviewProductOrder } = useStoreDialogs();
   const available = product.available !== false;
   const inCombo = combo.some(item => item.id === product.id);
@@ -26,7 +27,7 @@ export default function ProductCard({ product }) {
       <div className="market-card-body">
         <h3>{product.name}</h3>
         <p className="market-description">{product.description}</p>
-        <div className="market-price"><strong>S/ {formatPriceNumber(product.price)}</strong> <span>/ mes</span></div>
+        <div className="market-price"><strong>{formatPrice(product.price)}</strong> <span>/ mes</span></div>
         <div className="market-card-actions">
           <button type="button" className="market-primary" disabled={!available}
             onClick={() => reviewProductOrder(product)} aria-haspopup="dialog">

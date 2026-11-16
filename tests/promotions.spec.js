@@ -15,7 +15,7 @@ async function mockPromotions(page) {
     const { p_lines } = route.request().postDataJSON();
     expect(p_lines.every(line => Object.keys(line).sort().join() === 'id,kind,quantity')).toBe(true);
     const quote = published ? p_lines.map(line => {
-      const item = line.kind === 'promotion' ? offer : catalog.find(product => product.id === line.id);
+      const item = line.kind === 'promotion' ? offer : state.products.find(product => product.id === line.id);
       return { ...line, name: item.name, price: item.price,
         delivery_type: item.delivery_type ?? null, products: item.products ?? null };
     }) : null;
@@ -91,4 +91,30 @@ test('precio cambiado obliga a revisar y oferta retirada impide abrir WhatsApp',
   await expect(section).toHaveCount(0);
   await expect(checkout).toBeDisabled();
   expect(state.orders).toHaveLength(0);
+});
+
+test('Bolivia ve bolivianos referenciales y confirma el total exacto en PEN', async ({ page }) => {
+  const { state, offer } = await mockPromotions(page);
+  state.products[0].price = 10;
+  await page.route('**/.netlify/functions/store-currency', route =>
+    route.fulfill({ json: { country: 'BO', currency: 'BOB', rate: 2 } }));
+  await page.goto('/');
+  await expect(page.getByText('Precios referenciales en BOB.', { exact: false })).toBeVisible();
+  const section = page.getByRole('region', { name: /Promociones especiales/ });
+  await expect(section).toContainText(/Bs\s*33,00/);
+  const product = page.locator('#catalogo article').filter({ has: page.getByRole('heading', { name: catalog[0].name, exact: true }) });
+  await expect(product).toContainText(/Bs\s*20,00/);
+  await product.getByRole('button', { name: 'Pedir', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('S/ 10', { exact: true })).toBeVisible();
+  await expect(dialog).toContainText(/Pago en soles · Aprox\. Bs\s*20,00/);
+  await dialog.getByRole('button', { name: 'Seguir eligiendo' }).click();
+
+  await add(page, catalog[0].name);
+  await section.getByRole('button', { name: `Agregar promoción ${offer.name}` }).click();
+  await review(page).click();
+  await expect(dialog).toContainText(/Pago en soles · Aprox\. Bs\s*53,00/);
+  await dialog.getByRole('button', { name: 'Continuar en WhatsApp' }).click();
+  await expect.poll(() => state.orders.length).toBe(1);
+  expect(state.orders[0].searchParams.get('text')).toMatch(/Total: S\/ 26\.50 al mes/);
 });

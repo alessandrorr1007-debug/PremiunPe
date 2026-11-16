@@ -22,6 +22,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@supabase/supabase-js": "^2.48.1",
     "canvas-confetti": "^1.9.3",
+    "country-to-currency": "3.0.2",
     "framer-motion": "^14.3.0",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",

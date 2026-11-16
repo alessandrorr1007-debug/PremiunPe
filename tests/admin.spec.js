@@ -81,6 +81,16 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   await page.getByRole('button', { name: /^Crear Producto/ }).click();
   await expect.poll(() => state.products.some(product => product.name === 'Servicio creado en QA')).toBe(true);
   const initialRow = page.getByRole('row').filter({ hasText: 'Servicio creado en QA' });
+  const availability = initialRow.getByRole('checkbox', { name: 'Disponibilidad de Servicio creado en QA' });
+  const visibility = initialRow.getByRole('checkbox', { name: 'Visibilidad de Servicio creado en QA' });
+  await expect(availability.locator('+ span')).toHaveCSS('height', '20px');
+  await expect(availability.locator('+ span')).toHaveCSS('background-color', 'rgb(18, 120, 58)');
+  await expect(visibility.locator('+ span')).toHaveCSS('background-color', 'rgb(153, 60, 36)');
+  await availability.press('Space');
+  await expect(availability).not.toBeChecked();
+  await expect(availability.locator('+ span')).toHaveCSS('border-top-color', 'rgb(103, 78, 69)');
+  await availability.press('Space');
+  await expect(availability).toBeChecked();
   await initialRow.getByRole('button', { name: 'Editar producto' }).click();
   await page.getByPlaceholder('ej. Disney+ Premium').fill('Disney+ editado en QA');
   await page.getByRole('button', { name: /Precio y Estado/ }).click();

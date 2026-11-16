@@ -2,6 +2,27 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as root from '../src/client/lib/cart.js';
 import * as standalone from '../client/src/lib/cart.js';
+import storeCurrency from '../netlify/functions/store-currency.mjs';
+
+test('la moneda se resuelve por país y el respaldo siempre es PEN', async t => {
+  const request = new Request('https://premiunpee.netlify.app/.netlify/functions/store-currency');
+  const lookup = country => storeCurrency(request, { geo: { country: { code: country } } });
+  const fetch = t.mock.method(globalThis, 'fetch', async url => {
+    assert.match(url, /\/v2\/rate\/PEN\/BOB$/);
+    return Response.json({ base: 'PEN', quote: 'BOB', rate: 2 });
+  });
+  assert.deepEqual(await (await lookup('PE')).json(), { currency: 'PEN', rate: 1 });
+  assert.equal(fetch.mock.callCount(), 0);
+  const response = await lookup('BO');
+  assert.deepEqual(await response.json(), { currency: 'BOB', rate: 2, country: 'BO' });
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  await lookup('BO');
+  assert.equal(fetch.mock.callCount(), 1);
+
+  fetch.mock.mockImplementation(async () => Response.json({ base: 'USD', quote: 'BRL', rate: 5 }));
+  assert.deepEqual(await (await lookup('BR')).json(), { currency: 'PEN', rate: 1 });
+  assert.deepEqual(await (await lookup(undefined)).json(), { currency: 'PEN', rate: 1 });
+});
 
 function storageFor(entries) {
   const data = new Map(entries);

@@ -3,11 +3,12 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useStore } from '../context/StoreContext';
 import { Layers, Send, Sparkles, X, ChevronDown, Minus, Plus } from 'lucide-react';
 import { useStoreDialogs } from './StoreDialogs';
-import { formatPriceNumber } from '../lib/mockData';
+import { useStoreCurrency } from '../context/StoreCurrency';
 import { cartTotal, lineTotal } from '../lib/cart';
 
 export default function ComboBar() {
   const { combo, clearCombo, removeFromCombo, addToCombo, setPromotionQuantity, showSparkles } = useStore();
+  const { formatPrice } = useStoreCurrency();
   const { reviewComboOrder } = useStoreDialogs();
   const [isDragOver, setIsDragOver] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -35,7 +36,6 @@ export default function ComboBar() {
 
   // Total acumulado mensual
   const total = cartTotal(combo);
-  const totalFormatted = formatPriceNumber(total);
 
 
   // Soporte de zona drop para arrastrar tarjetas desde cualquier parte
@@ -106,7 +106,7 @@ export default function ComboBar() {
                           className={`inline-flex ${isPromotion ? 'flex-wrap' : ''} max-w-full items-center gap-1.5 pl-3 pr-1 min-h-[44px] rounded-xl bg-ink/[0.06] border text-cream text-xs font-medium ${accentStyles.split(' ')[0]}`}>
                           <span className={`w-2 h-2 rounded-full shrink-0 ${accentStyles.split(' ')[2]}`} />
                           <span className="min-w-0 truncate">{item.name}</span>
-                          <span className="text-muted text-[11px] shrink-0">S/ {formatPriceNumber(lineTotal(item))}</span>
+                          <span className="text-muted text-[11px] shrink-0">{formatPrice(lineTotal(item))}</span>
                           {isPromotion && (
                             <span className="inline-flex items-center gap-1">
                               <button type="button" aria-label={`Reducir cantidad de ${item.name}`}
@@ -144,7 +144,7 @@ export default function ComboBar() {
           <div className="text-left sm:text-right shrink-0">
             <span className="text-[10px] uppercase font-mono text-muted block">Total mensual</span>
             <div className="flex items-baseline gap-1">
-              <span className="font-sora font-bold text-xl sm:text-2xl text-aji tabular-nums">S/ {totalFormatted}</span>
+              <span className="font-sora font-bold text-xl sm:text-2xl text-aji tabular-nums">{formatPrice(total)}</span>
               <span className="text-[10px] text-muted">/mes</span>
             </div>
           </div>

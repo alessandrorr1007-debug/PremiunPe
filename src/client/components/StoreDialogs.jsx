@@ -1,7 +1,8 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { Check, MessageCircle, Plus, ArrowLeft, Package } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
-import { DELIVERY_TYPE_LABELS, formatPriceNumber, createComboWhatsAppUrl, createProductWhatsAppUrl } from '../lib/mockData';
+import { DELIVERY_TYPE_LABELS, createComboWhatsAppUrl, createProductWhatsAppUrl } from '../lib/mockData';
+import { formatSoles, useStoreCurrency } from '../context/StoreCurrency';
 import { cartTotal, lineTotal, matchesQuote } from '../lib/cart';
 import StoreDialog from './StoreDialog';
 import { BENEFITS_REVIEWED_AT, getProductBenefitInfo } from '../content/productBenefits';
@@ -16,6 +17,7 @@ const deliveryNotes = {
 };
 
 export function StoreDialogsProvider({ children }) {
+  const { currency, formatPrice } = useStoreCurrency();
   const { products, settings, combo, addToCombo, validateOrder } = useStore();
   const [dialog, setDialog] = useState(null);
   const openProductDetails = useCallback(product => setDialog({ view: 'details', product }), []);
@@ -82,7 +84,7 @@ export function StoreDialogsProvider({ children }) {
           {isDetails ? (
             <>
               <div className="flex items-start justify-between gap-4">
-                <div><p className="text-xs text-muted mb-1">Precio mensual</p><p className="text-3xl font-semibold tabular-nums">S/ {formatPriceNumber(product.price)}<span className="text-xs text-muted font-normal"> /mes</span></p></div>
+                <div><p className="text-xs text-muted mb-1">Precio mensual</p><p className="text-3xl font-semibold tabular-nums">{formatPrice(product.price)}<span className="text-xs text-muted font-normal"> /mes</span></p></div>
                 <span className={`rounded-full px-3 py-1 text-xs border ${product.available === false ? 'text-muted border-borderCream' : 'text-success border-success/20 bg-success/5'}`}>{product.available === false ? 'Agotado' : 'Disponible'}</span>
               </div>
               {product.description && <p className="text-sm text-muted leading-relaxed whitespace-pre-line break-words">{product.description}</p>}
@@ -129,17 +131,20 @@ export function StoreDialogsProvider({ children }) {
                     <h3 className="font-medium text-sm break-words">{item.name}</h3>
                     {item.kind === 'promotion' ? (
                       <div className="text-xs text-muted mt-1 break-words">
-                        <p>{item.quantity} × S/ {formatPriceNumber(item.price)}</p>
+                        <p>{item.quantity} × {formatPrice(item.price)}</p>
                         <ul className="list-disc pl-4">{item.products.map(included => <li key={included.id}>{included.name}</li>)}</ul>
                       </div>
                     ) : <p className="text-xs text-muted mt-1">{DELIVERY_TYPE_LABELS[item.delivery_type] || 'Modalidad por confirmar'}</p>}
                   </div>
-                  <p className="text-sm font-semibold tabular-nums shrink-0">S/ {formatPriceNumber(lineTotal(item))}<span className="block text-[11px] text-muted font-normal text-right">/mes</span></p>
+                  <p className="text-sm font-semibold tabular-nums shrink-0">{formatPrice(lineTotal(item))}<span className="block text-[11px] text-muted font-normal text-right">/mes</span></p>
                 </li>
               ))}</ul> : <div className="text-center py-6"><Package className="w-8 h-8 text-muted mx-auto mb-3" /><p className="text-sm">Tu combo está vacío.</p><p className="text-xs text-muted mt-2">Vuelve al catálogo para elegir tus servicios.</p></div>}
               <div className="rounded-2xl bg-ink/[0.04] border border-borderCream p-4 flex items-center justify-between gap-4" aria-live="polite" aria-atomic="true">
                 <div><p className="text-sm font-medium">Total mensual</p><p className="text-xs text-muted mt-1">{items.length} {items.length === 1 ? 'servicio' : 'servicios'}</p></div>
-                <p className="text-2xl sm:text-3xl font-semibold tabular-nums">S/ {formatPriceNumber(total)}</p>
+                <div className="text-right">
+                  <p className="text-2xl sm:text-3xl font-semibold tabular-nums">{formatSoles(total)}</p>
+                  {currency !== 'PEN' && <p className="text-xs text-muted">Pago en soles · Aprox. {formatPrice(total)}</p>}
+                </div>
               </div>
             </>
           )}

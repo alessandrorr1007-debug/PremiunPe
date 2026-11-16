@@ -197,6 +197,7 @@ function SortableRow({
       <td className="py-3 px-3 text-center">
         <Toggle
           checked={product.available}
+          ariaLabel={`Disponibilidad de ${product.name}`}
           onChange={() => onToggleAvailability(product.id)}
           activeColor="lime"
           size="sm"
@@ -207,6 +208,7 @@ function SortableRow({
       <td className="py-3 px-3 text-center">
         <Toggle
           checked={product.visible !== false}
+          ariaLabel={`Visibilidad de ${product.name}`}
           onChange={() => onToggleVisibility(product.id)}
           activeColor="aji"
           size="sm"

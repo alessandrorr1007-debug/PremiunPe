@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoreDialogs } from './StoreDialogs';
 import { useStore } from '../context/StoreContext';
+import { useStoreCurrency } from '../context/StoreCurrency';
 import { Search, Plus, MessageCircle, X } from 'lucide-react';
 import { 
   getProductMonogram, 
-  formatPriceNumber, 
   DELIVERY_TYPE_LABELS, 
 } from '../lib/mockData';
 
 export default function CommandPalette() {
   const { commandPaletteOpen, setCommandPaletteOpen, products, addToCombo } = useStore();
+  const { formatPrice } = useStoreCurrency();
   const { reviewProductOrder } = useStoreDialogs();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -167,7 +168,7 @@ export default function CommandPalette() {
                       {/* Lado derecho: Precio & Acciones Rápidas */}
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="text-aji font-sora font-semibold text-xs whitespace-nowrap">
-                          S/ {formatPriceNumber(prod.price)} /mes
+                          {formatPrice(prod.price)} /mes
                         </span>
 
                         <button

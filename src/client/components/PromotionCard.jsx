@@ -1,9 +1,10 @@
 import React from 'react';
 import { Package } from 'lucide-react';
-import { formatPriceNumber } from '../lib/mockData';
+import { useStoreCurrency } from '../context/StoreCurrency';
 import { productCover } from '../lib/productCovers';
 
 export default function PromotionCard({ offer, children }) {
+  const { formatPrice } = useStoreCurrency();
   const original = Number(offer.original_price);
   const savings = Math.round((original - Number(offer.price)) * 100) / 100;
   const percent = original > 0 ? Math.round(savings / original * 100) : 0;
@@ -34,11 +35,11 @@ export default function PromotionCard({ offer, children }) {
         </ul>
         {offer.description && <p className="text-sm text-muted w-full whitespace-pre-line">{offer.description}</p>}
         <p className="flex flex-wrap items-baseline gap-x-2">
-          <del aria-label="Precio original combinado" className="text-sm text-muted">S/ {formatPriceNumber(original)}</del>
-          <strong className="font-sora text-xl text-cream">S/ {formatPriceNumber(offer.price)}</strong>
+          <del aria-label="Precio original combinado" className="text-sm text-muted">{formatPrice(original)}</del>
+          <strong className="font-sora text-xl text-cream">{formatPrice(offer.price)}</strong>
           <span className="text-xs text-muted">/ mes</span>
         </p>
-        {savings > 0 && <p className="text-sm font-medium text-success">Ahorras S/ {formatPriceNumber(savings)} ({percent} %)</p>}
+        {savings > 0 && <p className="text-sm font-medium text-success">Ahorras {formatPrice(savings)} ({percent} %)</p>}
         {children}
       </div>
     </article>

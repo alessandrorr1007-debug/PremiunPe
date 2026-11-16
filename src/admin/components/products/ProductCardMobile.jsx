@@ -137,6 +137,7 @@ export default function ProductCardMobile({
             <span className="text-[10px] text-muted mb-0.5">Disp.</span>
             <Toggle
               checked={product.available}
+              ariaLabel={`Disponibilidad de ${product.name}`}
               onChange={() => onToggleAvailability(product.id)}
               activeColor="lime"
               size="sm"
@@ -147,6 +148,7 @@ export default function ProductCardMobile({
             <span className="text-[10px] text-muted mb-0.5">Vis.</span>
             <Toggle
               checked={product.visible !== false}
+              ariaLabel={`Visibilidad de ${product.name}`}
               onChange={() => onToggleVisibility(product.id)}
               activeColor="aji"
               size="sm"

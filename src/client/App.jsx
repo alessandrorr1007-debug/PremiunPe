@@ -1,6 +1,7 @@
 import React from 'react';
 import './storefront.css';
 import { StoreProvider } from './context/StoreContext';
+import { CurrencyNotice, StoreCurrencyProvider } from './context/StoreCurrency';
 import Navbar from './components/Navbar';
 import { StoreThemeProvider } from './components/StoreTheme';
 import StoreFeedback from './components/StoreFeedback';
@@ -20,6 +21,7 @@ import CommandPalette from './components/CommandPalette';
 export default function ClientStoreView() {
   return (
     <StoreProvider>
+      <StoreCurrencyProvider>
       <StoreThemeProvider>
       <MotionConfig reducedMotion="user">
       <StoreDialogsProvider>
@@ -31,6 +33,7 @@ export default function ClientStoreView() {
         <main className="store-main flex-1">
           {/* Portada */}
           <Hero />
+          <CurrencyNotice />
           <Promotions />
 
           {/* Catálogo */}
@@ -62,6 +65,7 @@ export default function ClientStoreView() {
     </StoreDialogsProvider>
     </MotionConfig>
     </StoreThemeProvider>
+    </StoreCurrencyProvider>
     </StoreProvider>
   );
 }
