@@ -64,7 +64,7 @@ export default function ImageUploader({ value, onChange, onFileSelect, disabled 
       {value ? (
         <div className="relative rounded-2xl bg-night border border-borderCream p-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-16 h-16 rounded-xl bg-white/[0.05] border border-borderCream overflow-hidden shrink-0">
+            <div className="w-16 h-16 rounded-xl bg-ink/[0.05] border border-borderCream overflow-hidden shrink-0">
               <img
                 src={value}
                 alt="Vista previa"
@@ -116,7 +116,7 @@ export default function ImageUploader({ value, onChange, onFileSelect, disabled 
             className="hidden"
           />
 
-          <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-borderCream flex items-center justify-center text-muted mx-auto mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-ink/[0.04] border border-borderCream flex items-center justify-center text-muted mx-auto mb-3">
             <UploadCloud className="w-6 h-6 text-aji" />
           </div>
 
@@ -153,7 +153,7 @@ export default function ImageUploader({ value, onChange, onFileSelect, disabled 
             type="button"
             onClick={handleApplyManualUrl}
             disabled={disabled}
-            className="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-semibold text-cream transition-colors min-h-[44px]"
+            className="px-4 py-2.5 rounded-xl bg-ink/[0.06] hover:bg-ink/[0.1] text-xs font-semibold text-cream transition-colors min-h-[44px]"
           >
             Aplicar
           </button>

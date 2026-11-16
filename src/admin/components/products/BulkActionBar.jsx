@@ -52,7 +52,7 @@ export default function BulkActionBar({
 
           <button
             onClick={() => onBulkHidden(selectedIds)}
-            className="px-2.5 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-borderCream text-muted hover:text-cream text-xs font-semibold flex items-center gap-1 transition-colors"
+            className="px-2.5 py-1.5 rounded-lg bg-ink/[0.05] hover:bg-ink/[0.1] border border-borderCream text-muted hover:text-cream text-xs font-semibold flex items-center gap-1 transition-colors"
             title="Ocultar del catálogo"
           >
             <EyeOff className="w-3.5 h-3.5" />

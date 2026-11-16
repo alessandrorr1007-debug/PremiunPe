@@ -37,11 +37,11 @@ export default function Sidebar({ activeTab, onTabChange }) {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r border-borderCream bg-[#09090b] fixed inset-y-0 left-0 z-30 select-none">
+    <aside className="hidden md:flex flex-col w-64 border-r border-borderCream bg-canvas fixed inset-y-0 left-0 z-30 select-none">
       {/* Cabecera / Marca */}
       <div className="h-16 flex items-center justify-between px-5 border-b border-borderCream">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-aji text-night flex items-center justify-center font-sora font-extrabold text-lg shadow-[0_0_15px_rgba(0,0,0,0.35)]">
+          <div className="w-9 h-9 rounded-xl bg-aji text-night flex items-center justify-center font-sora font-extrabold text-lg shadow-sm">
             P
           </div>
           <div>
@@ -85,8 +85,8 @@ export default function Sidebar({ activeTab, onTabChange }) {
               onClick={() => onTabChange(item.id)}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all min-h-[44px] ${
                 isActive
-                  ? 'bg-white/[0.08] text-cream font-semibold shadow-sm border border-borderCream'
-                  : 'text-muted hover:text-cream hover:bg-white/[0.04]'
+                  ? 'bg-ink/[0.08] text-cream font-semibold shadow-sm border border-borderCream'
+                  : 'text-muted hover:text-cream hover:bg-ink/[0.04]'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -95,7 +95,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
               </div>
               {item.badge !== null && (
                 <span className={`px-2 py-0.5 rounded-md text-[11px] font-mono tabular-nums ${
-                  isActive ? 'bg-aji/20 text-aji border border-aji/30 font-bold' : 'bg-white/[0.05] text-muted'
+                  isActive ? 'bg-aji/20 text-aji border border-aji/30 font-bold' : 'bg-ink/[0.05] text-muted'
                 }`}>
                   {item.badge}
                 </span>
@@ -112,7 +112,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
           href={clientStoreUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-muted hover:text-cream hover:bg-white/[0.04] transition-colors group min-h-[44px]"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-muted hover:text-cream hover:bg-ink/[0.04] transition-colors group min-h-[44px]"
         >
           <div className="flex items-center gap-2.5">
             <ExternalLink className="w-4 h-4 text-muted group-hover:text-aji transition-colors" />
@@ -123,8 +123,8 @@ export default function Sidebar({ activeTab, onTabChange }) {
       </div>
 
       {/* Pie de Sidebar: Admin info y Logout */}
-      <div className="p-3 border-t border-borderCream bg-[#09090b]">
-        <div className="p-2.5 rounded-xl bg-white/[0.03] border border-borderCream flex items-center justify-between gap-2">
+      <div className="p-3 border-t border-borderCream bg-canvas">
+        <div className="p-2.5 rounded-xl bg-ink/[0.03] border border-borderCream flex items-center justify-between gap-2">
           <div className="truncate text-left">
             <span className="text-[10px] uppercase font-semibold text-muted block">
               Conectado como

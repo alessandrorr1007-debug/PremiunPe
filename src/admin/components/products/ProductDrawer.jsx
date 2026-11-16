@@ -231,7 +231,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
   const previewAccent = getPreviewAccent(formData.accent);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-night/80 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex justify-end bg-ink/35 backdrop-blur-md animate-fadeIn">
       {/* Fondo clickeable para cerrar */}
       <div className="absolute inset-0" onClick={handleRequestClose} />
 
@@ -255,7 +255,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
 
           <button
             onClick={handleRequestClose}
-            className="w-9 h-9 rounded-xl text-muted hover:text-cream hover:bg-white/[0.06] transition-colors flex items-center justify-center"
+            className="w-9 h-9 rounded-xl text-muted hover:text-cream hover:bg-ink/[0.06] transition-colors flex items-center justify-center"
             aria-label="Cerrar panel"
           >
             <X className="w-5 h-5" />
@@ -380,7 +380,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                 <button
                   type="button"
                   onClick={() => setActiveSection('delivery')}
-                  className="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.09] text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
+                  className="w-full py-2.5 rounded-xl bg-ink/[0.05] hover:bg-ink/[0.09] text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
                 >
                   Siguiente: Entrega y Viñetas →
                 </button>
@@ -451,7 +451,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                 <div className="space-y-2">
                   {formData.includes.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-white/[0.05] border border-borderCream text-[11px] font-mono text-muted flex items-center justify-center shrink-0">
+                      <span className="w-6 h-6 rounded-full bg-ink/[0.05] border border-borderCream text-[11px] font-mono text-muted flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
                       <input
@@ -483,7 +483,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                 <button
                   type="button"
                   onClick={() => setActiveSection('pricing')}
-                  className="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.09] text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
+                  className="w-full py-2.5 rounded-xl bg-ink/[0.05] hover:bg-ink/[0.09] text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
                 >
                   Siguiente: Precio y Estado →
                 </button>
@@ -567,7 +567,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                 <button
                   type="button"
                   onClick={() => setActiveSection('image')}
-                  className="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.09] text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
+                  className="w-full py-2.5 rounded-xl bg-ink/[0.05] hover:bg-ink/[0.09] text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
                 >
                   Siguiente: Imagen y Acento →
                 </button>
@@ -593,7 +593,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                         onClick={() => setFormData({ ...formData, accent: acc.value })}
                         className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
                           isSelected
-                            ? 'bg-white/10 border-white ring-1 ring-white text-cream'
+                            ? 'bg-ink/10 border-aji ring-1 ring-aji text-cream'
                             : 'bg-night/60 border-borderCream text-muted hover:text-cream'
                         }`}
                       >
@@ -639,7 +639,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
               <button
                 type="button"
                 onClick={() => setPreviewFlipped(!previewFlipped)}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-xs font-sora text-muted hover:text-cream flex items-center gap-1.5 transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-ink/[0.06] hover:bg-ink/[0.1] text-xs font-sora text-muted hover:text-cream flex items-center gap-1.5 transition-colors"
               >
                 <RotateCw className="w-3.5 h-3.5" />
                 <span>{previewFlipped ? 'Ver Frente' : 'Ver Reverso'}</span>
@@ -651,7 +651,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
               {!previewFlipped ? (
                 /* Frente */
                 <div
-                  className={`rounded-[24px] bg-white/[0.04] border ${previewAccent.border} p-6 flex flex-col justify-between shadow-card relative overflow-hidden h-[380px]`}
+                  className={`rounded-[24px] bg-ink/[0.04] border ${previewAccent.border} p-6 flex flex-col justify-between shadow-card relative overflow-hidden h-[380px]`}
                 >
                   <div className="absolute inset-0 specular-shine pointer-events-none opacity-40" />
 
@@ -673,7 +673,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
 
                       <div className="flex items-center gap-2">
                         {!formData.available ? (
-                          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-500/20 text-zinc-400 border border-zinc-500/30">
+                          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-ink/5 text-muted border border-borderCream">
                             Agotado
                           </span>
                         ) : (
@@ -706,7 +706,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        className="py-2.5 px-3 rounded-xl bg-white/10 text-cream text-xs font-sora font-semibold flex items-center justify-center gap-1.5"
+                        className="py-2.5 px-3 rounded-xl bg-ink/10 text-cream text-xs font-sora font-semibold flex items-center justify-center gap-1.5"
                       >
                         <span>+ Agregar</span>
                       </button>
@@ -721,7 +721,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
               ) : (
                 /* Reverso ("Qué incluye") */
                 <div
-                  className={`rounded-[24px] bg-[#121216] border ${previewAccent.border} p-6 flex flex-col justify-between shadow-card relative overflow-hidden h-[380px]`}
+                  className={`rounded-[24px] bg-cardBg border ${previewAccent.border} p-6 flex flex-col justify-between shadow-card relative overflow-hidden h-[380px]`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3 border-b border-borderCream pb-2">
@@ -758,7 +758,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                     <button
                       type="button"
                       onClick={() => setPreviewFlipped(false)}
-                      className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream text-xs font-sora font-semibold flex items-center justify-center transition-all min-h-[44px]"
+                      className="w-full py-2.5 rounded-xl bg-ink/10 hover:bg-ink/20 text-cream text-xs font-sora font-semibold flex items-center justify-center transition-all min-h-[44px]"
                     >
                       Volver al frente
                     </button>
@@ -774,7 +774,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
           <button
             type="button"
             onClick={handleRequestClose}
-            className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-muted hover:text-cream text-xs font-sora font-semibold transition-colors min-h-[44px]"
+            className="px-4 py-2.5 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] text-muted hover:text-cream text-xs font-sora font-semibold transition-colors min-h-[44px]"
           >
             Cancelar
           </button>
@@ -802,7 +802,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
 
       {/* Diálogo de advertencia si intenta cerrar con cambios sin guardar */}
       {showDiscardConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-ink/35 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-sm rounded-[24px] bg-cardBg border border-aji/40 p-5 shadow-2xl text-left space-y-4">
             <div className="flex items-center gap-2.5 text-aji">
               <ShieldAlert className="w-5 h-5" />

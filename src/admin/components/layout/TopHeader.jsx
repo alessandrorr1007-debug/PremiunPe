@@ -16,7 +16,7 @@ export default function TopHeader({ activeTab, onOpenCreate }) {
   };
 
   return (
-    <header className="sticky top-0 z-20 h-16 border-b border-borderCream bg-[#09090b]/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between">
+    <header className="sticky top-0 z-20 h-16 border-b border-borderCream bg-canvas/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between">
       {/* Título de la sección activa */}
       <div className="flex items-center gap-3">
         {/* Monograma visible en móvil */}
@@ -36,13 +36,13 @@ export default function TopHeader({ activeTab, onOpenCreate }) {
       {/* Controles y accesos rápidos */}
       <div className="flex items-center gap-3">
         {/* Atajo visual para desktop */}
-        <div className="hidden lg:flex items-center gap-2 text-xs text-muted bg-white/[0.03] border border-borderCream px-3 py-1.5 rounded-xl">
+        <div className="hidden lg:flex items-center gap-2 text-xs text-muted bg-ink/[0.03] border border-borderCream px-3 py-1.5 rounded-xl">
           <span>Atajos:</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-cream">
+          <kbd className="px-1.5 py-0.5 rounded bg-ink/[0.08] text-[10px] font-mono text-cream">
             /
           </kbd>
           <span>Buscar</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-cream">
+          <kbd className="px-1.5 py-0.5 rounded bg-ink/[0.08] text-[10px] font-mono text-cream">
             N
           </kbd>
           <span>Nuevo</span>
@@ -51,7 +51,7 @@ export default function TopHeader({ activeTab, onOpenCreate }) {
         {/* Botón Ver Tienda */}
         <Link
           to="/"
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-borderCream text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] border border-borderCream text-xs font-sora font-semibold text-cream transition-colors min-h-[44px]"
           title="Ver la tienda pública de clientes"
         >
           <span>Ver Tienda</span>

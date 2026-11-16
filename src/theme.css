@@ -1,0 +1,25 @@
+html[data-store-theme="light"],
+.admin-theme {
+  --store-canvas: 250 245 239;
+  --store-night: 250 245 239;
+  --store-surface: 255 251 247;
+  --store-cardBg: 255 251 247;
+  --store-borderCream: 228 211 200;
+  --store-cream: 57 27 21;
+  --store-muted: 103 78 69;
+  --store-aji: 153 60 36;
+  --store-action: 153 60 36;
+  --store-actionInk: 255 251 247;
+  --store-whatsapp: 18 120 58;
+  --store-soft: 244 229 218;
+}
+
+.admin-theme {
+  color-scheme: light;
+  --store-ink: var(--store-cream);
+  --store-rocoto: 161 48 32;
+  --store-lime: var(--store-whatsapp);
+  --store-success: var(--store-whatsapp);
+  --store-strong: 142 111 98;
+  --store-secondary: var(--store-muted);
+}

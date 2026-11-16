@@ -55,7 +55,7 @@ export default function InactivityGuard() {
   if (!showWarning) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/35 backdrop-blur-md animate-fadeIn">
       <div className="w-full max-w-md rounded-[24px] bg-cardBg border border-aji/40 p-6 shadow-2xl text-cream space-y-4">
         <div className="flex items-center gap-3 text-aji">
           <div className="w-10 h-10 rounded-xl bg-aji/15 border border-aji/30 flex items-center justify-center">

@@ -43,7 +43,7 @@ export default function DeleteConfirmModal({ isOpen, onClose, product, productId
   const isButtonDisabled = deleting || (isBulk && confirmationWord !== 'ELIMINAR');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/85 backdrop-blur-md animate-fadeIn select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/35 backdrop-blur-md animate-fadeIn select-none">
       <div className="relative w-full max-w-md rounded-[24px] bg-cardBg border border-rocoto/40 shadow-2xl p-6 text-left text-cream">
         <div className="flex items-center justify-between pb-3 border-b border-borderCream">
           <div className="flex items-center gap-3 text-rocoto">
@@ -56,7 +56,7 @@ export default function DeleteConfirmModal({ isOpen, onClose, product, productId
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-muted hover:text-cream hover:bg-white/5 transition-colors"
+            className="p-2 rounded-lg text-muted hover:text-cream hover:bg-ink/5 transition-colors"
             aria-label="Cerrar modal"
           >
             <X className="w-4 h-4" />
@@ -95,7 +95,7 @@ export default function DeleteConfirmModal({ isOpen, onClose, product, productId
             type="button"
             onClick={onClose}
             disabled={deleting}
-            className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-muted hover:text-cream font-sora font-semibold text-xs transition-colors min-h-[44px]"
+            className="px-4 py-2.5 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] text-muted hover:text-cream font-sora font-semibold text-xs transition-colors min-h-[44px]"
           >
             Cancelar
           </button>

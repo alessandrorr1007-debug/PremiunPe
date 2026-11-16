@@ -14,7 +14,7 @@ export default function PromotionCard({ offer, children }) {
       {offer.image_url ? (
         <img className="w-full h-28 object-cover" src={offer.image_url} alt="" loading="lazy" />
       ) : (
-        <div className={splitCover ? 'grid grid-cols-2 aspect-[1.65] bg-ink/5' : 'flex flex-wrap items-center gap-2 p-4 bg-ink/5'}>
+        <div className={splitCover ? 'grid h-24 grid-cols-2 bg-ink/5 sm:h-auto sm:aspect-[1.65]' : 'flex flex-wrap items-center gap-2 p-4 bg-ink/5'}>
           {offer.products.map(product => {
             const image = product.image_url?.trim() || productCover(product.name).cover;
             return (

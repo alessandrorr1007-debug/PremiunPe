@@ -35,6 +35,9 @@ test('oferta antes del catálogo, cantidades persistidas y pedido mixto confirma
     return left.width > 0 && Math.abs(left.width - right.width) < 1 &&
       Math.abs(left.right - right.left) < 1 && left.top === right.top;
   })).toBe(true);
+  if (page.viewportSize().width < 640) {
+    expect((await covers.first().boundingBox()).height).toBeLessThanOrEqual(96);
+  }
   await expect(page.getByRole('button', { name: `Ver detalles de ${catalog[0].name}` })).toHaveText('');
   await expect(page.getByRole('heading', { name: catalog[0].name, exact: true })).toBeVisible();
   await expect(section).toContainText(/Ahorras S\/ 5[.,]25 \(24 %\)/);

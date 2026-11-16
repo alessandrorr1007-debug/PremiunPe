@@ -25,7 +25,7 @@ export default function StatCard({ title, count, subtitle, icon: Icon, color = '
 
   const colorStyles = {
     brand: {
-      bg: 'bg-white/[0.05] border-borderCream text-cream',
+      bg: 'bg-ink/[0.05] border-borderCream text-cream',
       num: 'text-cream',
     },
     emerald: {
@@ -49,7 +49,7 @@ export default function StatCard({ title, count, subtitle, icon: Icon, color = '
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-[20px] bg-[#121216]/90 border border-borderCream p-5 shadow-admin-card flex flex-col justify-between hover:border-cream/20 transition-all text-left group"
+      className="rounded-[20px] bg-cardBg border border-borderCream p-5 shadow-sm flex flex-col justify-between hover:border-cream/20 transition-all text-left group"
     >
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-semibold text-muted">{title}</span>

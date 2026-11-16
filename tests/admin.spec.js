@@ -10,6 +10,8 @@ test('un usuario de demo falsificado no abre el panel', async ({ page }) => {
   await page.goto('/admin');
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole('button', { name: /iniciar sesión/i })).toBeVisible();
+  await expect(page.locator('.admin-theme')).toHaveCSS('background-color', 'rgb(250, 245, 239)');
+  await expect(page.getByRole('button', { name: /iniciar sesión/i })).toHaveCSS('background-color', 'rgb(153, 60, 36)');
 });
 
 async function mockAdminAuth(page) {
@@ -69,6 +71,8 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   });
 
   await login();
+  await expect(page.locator('.admin-theme')).toHaveCSS('background-color', 'rgb(250, 245, 239)');
+  await expect(page.getByRole('banner')).toHaveCSS('background-color', 'rgba(250, 245, 239, 0.9)');
   await page.getByRole('button', { name: /^Productos/ }).click();
   await page.getByRole('button', { name: /^Nuevo Producto/ }).click();
   await page.getByPlaceholder('ej. Disney+ Premium').fill('Servicio creado en QA');

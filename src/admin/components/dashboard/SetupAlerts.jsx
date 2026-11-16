@@ -74,7 +74,7 @@ export default function SetupAlerts({ settings, products, onGoToSettings, onFilt
 
             <button
               onClick={alert.onClick}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-aji hover:text-night border border-borderCream text-cream text-xs font-sora font-semibold flex items-center gap-1.5 self-start sm:self-auto shrink-0 transition-all min-h-[44px]"
+              className="px-4 py-2 rounded-xl bg-ink/10 hover:bg-aji hover:text-night border border-borderCream text-cream text-xs font-sora font-semibold flex items-center gap-1.5 self-start sm:self-auto shrink-0 transition-all min-h-[44px]"
             >
               <span>{alert.actionText}</span>
               <ArrowRight className="w-3.5 h-3.5" />

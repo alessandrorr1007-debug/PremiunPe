@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, User, AlertCircle, Eye, EyeOff, ShieldCheck, Clock, ArrowLeft } from 'lucide-react';
+import '../../theme.css';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -75,7 +76,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-night text-cream p-4 relative overflow-hidden select-none font-inter">
+    <div className="admin-theme min-h-screen flex flex-col justify-center items-center bg-night text-cream p-4 relative overflow-hidden select-none font-inter">
       {/* Halo de luz ambiente cálido */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[540px] h-[400px] bg-aji/10 rounded-full blur-[140px] pointer-events-none" />
 
@@ -83,7 +84,7 @@ export default function LoginPage() {
       <div className="absolute top-6 left-6 z-20">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-borderCream text-xs text-muted hover:text-cream transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] border border-borderCream text-xs text-muted hover:text-cream transition-all"
         >
           <ArrowLeft className="w-4 h-4 text-aji" />
           <span>Volver a la tienda</span>
@@ -91,10 +92,10 @@ export default function LoginPage() {
       </div>
 
       <main className="w-full max-w-[420px] relative z-10">
-        <div className="rounded-[24px] bg-[#121216]/95 border border-borderCream p-8 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl">
+        <div className="rounded-[24px] bg-cardBg border border-borderCream p-8 sm:p-9 shadow-[0_12px_32px_rgb(57_27_21_/_0.1)]">
           {/* Logo y Encabezado */}
           <div className="text-center mb-7">
-            <div className="w-12 h-12 rounded-2xl bg-aji text-night flex items-center justify-center font-sora font-extrabold text-2xl mx-auto mb-4 shadow-[0_0_20px_rgba(0,0,0,0.45)]">
+            <div className="w-12 h-12 rounded-2xl bg-aji text-night flex items-center justify-center font-sora font-extrabold text-2xl mx-auto mb-4 shadow-sm">
               P
             </div>
             <h1 className="text-2xl font-sora font-bold text-cream tracking-tight">
@@ -106,7 +107,7 @@ export default function LoginPage() {
           </div>
 
           {/* Aviso de seguridad */}
-          <div className="mb-6 p-3 rounded-xl bg-white/[0.03] border border-borderCream text-xs text-muted flex items-start gap-2.5">
+          <div className="mb-6 p-3 rounded-xl bg-ink/[0.03] border border-borderCream text-xs text-muted flex items-start gap-2.5">
             <ShieldCheck className="w-4 h-4 text-aji shrink-0 mt-0.5" />
             <span>
               Ingresa con tus credenciales de administrador autorizadas.
@@ -144,7 +145,7 @@ export default function LoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Ingresa tu usuario o correo"
                   disabled={submitting || cooldownSeconds > 0}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/[0.04] border border-borderCream text-cream placeholder-muted/60 text-xs sm:text-sm focus:outline-none focus:border-aji transition-all min-h-[44px]"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-ink/[0.04] border border-borderCream text-cream placeholder-muted/60 text-xs sm:text-sm focus:outline-none focus:border-aji transition-all min-h-[44px]"
                 />
               </div>
             </div>
@@ -162,7 +163,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   disabled={submitting || cooldownSeconds > 0}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white/[0.04] border border-borderCream text-cream placeholder-muted/60 text-xs sm:text-sm focus:outline-none focus:border-aji transition-all min-h-[44px]"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-ink/[0.04] border border-borderCream text-cream placeholder-muted/60 text-xs sm:text-sm focus:outline-none focus:border-aji transition-all min-h-[44px]"
                 />
                 <button
                   type="button"

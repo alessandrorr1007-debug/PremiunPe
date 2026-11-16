@@ -25,7 +25,7 @@ export default function RestockQuickList({ products, onToggleAvailability }) {
   };
 
   return (
-    <div className="rounded-[20px] bg-[#121216]/90 border border-borderCream p-5 sm:p-6 shadow-admin-card text-left">
+    <div className="rounded-[20px] bg-cardBg border border-borderCream p-5 sm:p-6 shadow-sm text-left">
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-borderCream">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-rocoto animate-pulse" />
@@ -53,7 +53,7 @@ export default function RestockQuickList({ products, onToggleAvailability }) {
           {outOfStock.map((prod) => (
             <div
               key={prod.id}
-              className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-white/[0.02] rounded-xl transition-colors"
+              className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-ink/[0.02] rounded-xl transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-rocoto/20 border border-rocoto/30 text-rocoto flex items-center justify-center text-xs font-sora font-extrabold shrink-0 overflow-hidden">

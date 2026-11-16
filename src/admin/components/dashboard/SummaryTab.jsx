@@ -68,7 +68,7 @@ export default function SummaryTab({
       </div>
 
       {/* Acciones Rápidas */}
-      <div className="rounded-[20px] bg-[#121216]/90 border border-borderCream p-5 sm:p-6 shadow-admin-card text-left">
+      <div className="rounded-[20px] bg-cardBg border border-borderCream p-5 sm:p-6 shadow-sm text-left">
         <h3 className="text-xs font-sora font-bold uppercase tracking-wider text-muted mb-4">
           Acciones Rápidas
         </h3>
@@ -77,7 +77,7 @@ export default function SummaryTab({
           <button
             type="button"
             onClick={onOpenCreate}
-            className="p-4 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
+            className="p-4 rounded-xl bg-ink/[0.03] hover:bg-ink/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-aji/15 border border-aji/30 flex items-center justify-center text-aji">
@@ -94,7 +94,7 @@ export default function SummaryTab({
           <button
             type="button"
             onClick={onGoToSettings}
-            className="p-4 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
+            className="p-4 rounded-xl bg-ink/[0.03] hover:bg-ink/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-whatsapp/15 border border-whatsapp/30 flex items-center justify-center text-whatsapp">
@@ -112,7 +112,7 @@ export default function SummaryTab({
             href={clientStoreUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-4 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
+            className="p-4 rounded-xl bg-ink/[0.03] hover:bg-ink/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-lime/15 border border-lime/30 flex items-center justify-center text-lime">

@@ -1,19 +1,7 @@
 
+@import '../theme.css';
+
 /* Storefront layout */
-html[data-store-theme="light"] {
-  --store-canvas: 250 245 239;
-  --store-night: 250 245 239;
-  --store-surface: 255 251 247;
-  --store-cardBg: 255 251 247;
-  --store-borderCream: 228 211 200;
-  --store-cream: 57 27 21;
-  --store-muted: 103 78 69;
-  --store-aji: 153 60 36;
-  --store-action: 153 60 36;
-  --store-actionInk: 255 251 247;
-  --store-whatsapp: 18 120 58;
-  --store-soft: 244 229 218;
-}
 html[data-store-theme="light"] .store-shell { background-image: none; }
 html[data-store-theme="light"] .market-header { background: rgb(250 245 239 / .96); }
 html[data-store-theme="light"] .market-header nav a[aria-current="location"] { background: #f5dbce; color: #91351f; }

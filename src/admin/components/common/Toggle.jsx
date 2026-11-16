@@ -29,7 +29,7 @@ export default function Toggle({ checked, onChange, label, activeColor = 'brand'
         />
         <div
           className={`${sizeClasses.switch} rounded-full transition-colors duration-200 ease-in-out border border-borderCream ${
-            checked ? activeBg : 'bg-white/10'
+            checked ? activeBg : 'bg-ink/10'
           }`}
         />
         <div

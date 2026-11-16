@@ -254,7 +254,7 @@ export default function ProductsTab({
       {/* Estado Vacío */}
       {filteredProducts.length === 0 && (
         <div className="py-16 text-center rounded-[24px] bg-cardBg border border-borderCream p-8 flex flex-col items-center justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-borderCream flex items-center justify-center text-muted mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-ink/[0.04] border border-borderCream flex items-center justify-center text-muted mb-3">
             <PackageX className="w-6 h-6" />
           </div>
           <h3 className="text-base font-bold font-sora text-cream">No se encontraron productos</h3>
@@ -267,7 +267,7 @@ export default function ProductsTab({
               setSelectedCategory('Todos');
               setStatusFilter('all');
             }}
-            className="mt-4 px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-borderCream text-xs font-semibold text-cream transition-colors min-h-[44px]"
+            className="mt-4 px-4 py-2.5 rounded-xl bg-ink/[0.05] hover:bg-ink/[0.1] border border-borderCream text-xs font-semibold text-cream transition-colors min-h-[44px]"
           >
             Restablecer filtros
           </button>

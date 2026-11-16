@@ -49,7 +49,7 @@ export default function ProductCardMobile({
             type="checkbox"
             checked={isSelected}
             onChange={() => onToggleSelect(product.id)}
-            className="w-4 h-4 rounded border-borderCream bg-white/5 text-aji focus:ring-aji/40 cursor-pointer shrink-0"
+            className="w-4 h-4 rounded border-borderCream bg-ink/5 text-aji focus:ring-aji/40 cursor-pointer shrink-0"
             aria-label={`Seleccionar ${product.name}`}
           />
 
@@ -81,7 +81,7 @@ export default function ProductCardMobile({
               {product.name}
             </h4>
             <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/[0.05] border border-borderCream text-muted">
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-ink/[0.05] border border-borderCream text-muted">
                 {product.category}
               </span>
               <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold ${getAccentBadge(product.accent)}`}>
@@ -101,7 +101,7 @@ export default function ProductCardMobile({
           <button
             onClick={() => onReorder(product.id, 'up')}
             disabled={!canMoveUp}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] text-muted hover:text-cream flex items-center justify-center disabled:opacity-20 active:scale-95"
+            className="w-8 h-8 rounded-lg bg-ink/[0.04] text-muted hover:text-cream flex items-center justify-center disabled:opacity-20 active:scale-95"
             aria-label="Subir orden"
           >
             <ChevronUp className="w-4 h-4" />
@@ -109,7 +109,7 @@ export default function ProductCardMobile({
           <button
             onClick={() => onReorder(product.id, 'down')}
             disabled={!canMoveDown}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] text-muted hover:text-cream flex items-center justify-center disabled:opacity-20 active:scale-95"
+            className="w-8 h-8 rounded-lg bg-ink/[0.04] text-muted hover:text-cream flex items-center justify-center disabled:opacity-20 active:scale-95"
             aria-label="Bajar orden"
           >
             <ChevronDown className="w-4 h-4" />
@@ -158,7 +158,7 @@ export default function ProductCardMobile({
             className={`w-9 h-9 rounded-xl transition-colors flex items-center justify-center ${
               product.featured
                 ? 'text-aji bg-aji/10 border border-aji/30'
-                : 'text-muted/40 bg-white/[0.03] border border-borderCream'
+                : 'text-muted/40 bg-ink/[0.03] border border-borderCream'
             }`}
             title="Destacado"
             aria-label="Destacar producto"
@@ -172,7 +172,7 @@ export default function ProductCardMobile({
       <div className="pt-2 border-t border-borderCream/60 grid grid-cols-3 gap-2">
         <button
           onClick={() => onEdit(product)}
-          className="min-h-[44px] rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-borderCream text-cream text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-95 font-sora"
+          className="min-h-[44px] rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] border border-borderCream text-cream text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-95 font-sora"
         >
           <Edit3 className="w-4 h-4 text-muted" />
           <span>Editar</span>
@@ -180,7 +180,7 @@ export default function ProductCardMobile({
 
         <button
           onClick={() => onDuplicate(product.id)}
-          className="min-h-[44px] rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-borderCream text-aji text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-95 font-sora"
+          className="min-h-[44px] rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] border border-borderCream text-aji text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-95 font-sora"
         >
           <Copy className="w-4 h-4 text-aji" />
           <span>Duplicar</span>

@@ -95,7 +95,7 @@ export default function QuickPriceEdit({ product }) {
   return (
     <button
       onClick={handleStartEdit}
-      className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/[0.08] transition-colors font-mono text-xs tabular-nums text-left border border-transparent hover:border-borderCream"
+      className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-ink/[0.08] transition-colors font-mono text-xs tabular-nums text-left border border-transparent hover:border-borderCream"
       title="Clic para editar precio (Enter guarda, Esc cancela)"
     >
       <span className="font-bold text-cream group-hover:text-aji">

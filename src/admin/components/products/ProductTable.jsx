@@ -81,7 +81,7 @@ function SortableRow({
       ref={setNodeRef}
       style={style}
       className={`group transition-colors border-b border-borderCream/60 ${
-        isSelected ? 'bg-aji/[0.08]' : 'hover:bg-white/[0.02]'
+        isSelected ? 'bg-aji/[0.08]' : 'hover:bg-ink/[0.02]'
       } ${isDragging ? 'bg-cardBg shadow-2xl ring-1 ring-aji/40' : ''}`}
     >
       {/* Checkbox */}
@@ -90,7 +90,7 @@ function SortableRow({
           type="checkbox"
           checked={isSelected}
           onChange={() => onToggleSelect(product.id)}
-          className="rounded border-borderCream bg-white/5 text-aji focus:ring-aji/40 cursor-pointer w-4 h-4"
+          className="rounded border-borderCream bg-ink/5 text-aji focus:ring-aji/40 cursor-pointer w-4 h-4"
           aria-label={`Seleccionar ${product.name}`}
         />
       </td>
@@ -101,7 +101,7 @@ function SortableRow({
           <button
             {...attributes}
             {...listeners}
-            className="p-1 rounded text-muted hover:text-cream cursor-grab active:cursor-grabbing hover:bg-white/[0.06] transition-colors"
+            className="p-1 rounded text-muted hover:text-cream cursor-grab active:cursor-grabbing hover:bg-ink/[0.06] transition-colors"
             title="Arrastrar para reordenar"
             aria-label="Arrastrar para reordenar"
           >
@@ -111,7 +111,7 @@ function SortableRow({
             <button
               onClick={() => onReorder(product.id, 'up')}
               disabled={idx === 0}
-              className="p-0.5 rounded hover:bg-white/10 text-muted hover:text-cream disabled:opacity-20 disabled:hover:bg-transparent"
+              className="p-0.5 rounded hover:bg-ink/10 text-muted hover:text-cream disabled:opacity-20 disabled:hover:bg-transparent"
               title="Subir orden"
             >
               <ChevronUp className="w-3 h-3" />
@@ -119,7 +119,7 @@ function SortableRow({
             <button
               onClick={() => onReorder(product.id, 'down')}
               disabled={idx === totalProducts - 1}
-              className="p-0.5 rounded hover:bg-white/10 text-muted hover:text-cream disabled:opacity-20 disabled:hover:bg-transparent"
+              className="p-0.5 rounded hover:bg-ink/10 text-muted hover:text-cream disabled:opacity-20 disabled:hover:bg-transparent"
               title="Bajar orden"
             >
               <ChevronDown className="w-3 h-3" />
@@ -176,7 +176,7 @@ function SortableRow({
 
       {/* Categoría */}
       <td className="py-3 px-3">
-        <span className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-borderCream text-[11px] font-medium text-cream/90 whitespace-nowrap">
+        <span className="px-2.5 py-1 rounded-lg bg-ink/[0.04] border border-borderCream text-[11px] font-medium text-cream/90 whitespace-nowrap">
           {product.category}
         </span>
       </td>
@@ -220,7 +220,7 @@ function SortableRow({
           className={`p-1.5 rounded-lg transition-colors ${
             product.featured
               ? 'text-aji hover:bg-aji/10'
-              : 'text-muted/40 hover:text-muted hover:bg-white/5'
+              : 'text-muted/40 hover:text-muted hover:bg-ink/5'
           }`}
           title={product.featured ? 'Destacado en portada' : 'No destacado'}
         >
@@ -233,7 +233,7 @@ function SortableRow({
         <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit(product)}
-            className="p-1.5 rounded-lg text-muted hover:text-cream hover:bg-white/[0.08] transition-colors"
+            className="p-1.5 rounded-lg text-muted hover:text-cream hover:bg-ink/[0.08] transition-colors"
             title="Editar producto"
           >
             <Edit3 className="w-4 h-4" />
@@ -317,7 +317,7 @@ export default function ProductTable({
                     type="checkbox"
                     checked={allSelected}
                     onChange={onToggleSelectAll}
-                    className="rounded border-borderCream bg-white/5 text-aji focus:ring-aji/40 cursor-pointer w-4 h-4"
+                    className="rounded border-borderCream bg-ink/5 text-aji focus:ring-aji/40 cursor-pointer w-4 h-4"
                     aria-label="Seleccionar todos los productos"
                   />
                 </th>
