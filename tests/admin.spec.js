@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { devices, expect, test } from '@playwright/test';
 import { mockStore } from './store-fixture.js';
 
 test('un usuario de demo falsificado no abre el panel', async ({ page }) => {
@@ -42,7 +43,7 @@ async function mockAdminAuth(page) {
   };
 }
 
-test('sesión administrativa verificada, CRUD aislado y cierre de sesión', async ({ page }) => {
+test('sesión administrativa verificada, CRUD aislado y cierre de sesión', async ({ page, browser }) => {
   const state = await mockStore(page);
   const login = await mockAdminAuth(page);
   const headers = { 'access-control-allow-origin': '*' };
@@ -77,18 +78,104 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   await expect.poll(() => state.products.some(product => product.name === 'Servicio creado en QA')).toBe(true);
   const initialRow = page.getByRole('row').filter({ hasText: 'Servicio creado en QA' });
   await initialRow.getByRole('button', { name: 'Editar producto' }).click();
-  await page.getByPlaceholder('ej. Disney+ Premium').fill('Servicio editado en QA');
+  await page.getByPlaceholder('ej. Disney+ Premium').fill('Disney+ editado en QA');
   await page.getByRole('button', { name: /Precio y Estado/ }).click();
   await page.getByPlaceholder('12.00').fill('25.50');
   await page.getByRole('button', { name: 'Guardar Cambios' }).click();
-  const updatedRow = page.getByRole('row').filter({ hasText: 'Servicio editado en QA' });
+  const updatedRow = page.getByRole('row').filter({ hasText: 'Disney+ editado en QA' });
   await expect(updatedRow).toContainText(/25[.,]50/);
 
-  const storefront = await page.context().newPage();
-  await mockStore(storefront, state);
-  await storefront.goto('/');
-  await expect(storefront.getByRole('heading', { name: 'Servicio editado en QA', exact: true })).toBeVisible();
-  await storefront.close();
+  const getCover = guestPage => guestPage.getByRole('button', { name: 'Ver detalles de Disney+ editado en QA' }).locator('img');
+  const imageBytes = [
+    readFileSync(new URL('../src/client/assets/covers/canva.webp', import.meta.url)),
+    readFileSync(new URL('../src/client/assets/covers/gemini.webp', import.meta.url)),
+  ];
+  const uploads = new Map();
+  const storagePath = '/storage/v1/object/product-images/products/';
+  const publicPath = '/storage/v1/object/public/product-images/products/';
+  await page.route(`https://premiumpe-qa.invalid${storagePath}*`, async route => {
+    const request = route.request();
+    expect(request.method()).toBe('POST');
+    expect(request.headers().authorization).toMatch(/^Bearer .+\.test$/);
+    const bytes = imageBytes[uploads.size];
+    expect(request.postDataBuffer().includes(bytes)).toBe(true);
+    const filename = new URL(request.url()).pathname.split('/').at(-1);
+    uploads.set(filename, bytes);
+    await route.fulfill({ headers, json: { Key: `product-images/products/${filename}` } });
+  });
+
+  const guestSessions = await Promise.all([
+    browser.newContext(devices['Desktop Chrome']),
+    browser.newContext(devices['iPhone 13']),
+  ]);
+  try {
+    const guests = await Promise.all(guestSessions.map(async session => {
+      const guest = await session.newPage();
+      await mockStore(guest, state);
+      await guest.route(`https://premiumpe-qa.invalid${publicPath}*`, route => {
+        const request = route.request();
+        expect(request.headers().authorization).toBeUndefined();
+        const filename = new URL(request.url()).pathname.split('/').at(-1);
+        const bytes = uploads.get(filename);
+        return bytes
+          ? route.fulfill({ body: bytes, contentType: 'image/webp', headers: { 'cache-control': 'public, max-age=3600' } })
+          : route.fulfill({ status: 404 });
+      });
+      await guest.goto('/');
+      return guest;
+    }));
+
+    const openImageEditor = async () => {
+      await updatedRow.getByRole('button', { name: 'Editar producto' }).click();
+      await page.getByRole('button', { name: /Precio y Estado/ }).click();
+      await page.getByRole('button', { name: /Siguiente: Imagen y Acento/ }).click();
+    };
+    const save = async () => {
+      const button = page.getByRole('button', { name: 'Guardar Cambios' });
+      await button.click();
+      await expect(button).toHaveCount(0);
+    };
+    for (const [index, bytes] of imageBytes.entries()) {
+      await openImageEditor();
+      if (index > 0) await expect(page.getByAltText('Vista previa', { exact: true })).toHaveAttribute('src', new RegExp(publicPath));
+      const remove = page.getByTitle('Quitar imagen');
+      if (index > 0) await remove.click();
+      await page.locator('input[type=file]').setInputFiles({ name: 'portada.webp', mimeType: 'image/webp', buffer: bytes });
+      await expect(page.getByAltText('Vista previa', { exact: true })).toHaveAttribute('src', /^blob:/);
+      await save();
+      const filename = [...uploads.keys()][index];
+      const imageUrl = `https://premiumpe-qa.invalid${publicPath}${filename}`;
+      expect(uploads.size).toBe(index + 1);
+      expect(state.products.find(product => product.id === 'qa-created').image_url).toBe(imageUrl);
+      await page.reload();
+      await page.getByRole('button', { name: /^Productos/ }).click();
+      await expect(updatedRow.locator('img')).toHaveAttribute('src', imageUrl);
+
+      for (const guest of guests) {
+        await guest.reload();
+        const cover = getCover(guest);
+        await cover.scrollIntoViewIfNeeded();
+        await expect(cover).toHaveAttribute('src', imageUrl);
+        await expect.poll(() => cover.evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+      }
+    }
+    expect(new Set(uploads.keys()).size).toBe(2);
+
+    await openImageEditor();
+    await page.getByTitle('Quitar imagen').click();
+    await save();
+    expect(state.products.find(product => product.id === 'qa-created').image_url).toBe('');
+    for (const guest of guests) {
+      await guest.reload();
+      const cover = getCover(guest);
+      await cover.scrollIntoViewIfNeeded();
+      await expect(cover).toHaveAttribute('src', /\/assets\/disney-.*\.webp$/);
+      await expect.poll(() => cover.evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+      await expect(guest.getByRole('heading', { name: 'Disney+ editado en QA', exact: true })).toBeVisible();
+    }
+  } finally {
+    await Promise.all(guestSessions.map(session => session.close()));
+  }
 
   await updatedRow.getByRole('button', { name: 'Eliminar producto' }).click();
   await page.getByRole('button', { name: 'Confirmar Eliminación' }).click();
@@ -98,7 +185,7 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   await page.getByRole('button', { name: 'Cerrar Sesión', exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Servicio editado en QA', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Disney+ editado en QA', exact: true })).toHaveCount(0);
 });
 
 test('Configuración permite editar, previsualizar, activar, pausar y eliminar una promoción', async ({ page }) => {

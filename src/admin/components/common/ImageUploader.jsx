@@ -2,10 +2,8 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, Trash2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function ImageUploader({ value, onChange }) {
+export default function ImageUploader({ value, onChange, onFileSelect, disabled }) {
   const [dragOver, setDragOver] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [manualUrl, setManualUrl] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
   const fileInputRef = useRef(null);
@@ -13,12 +11,12 @@ export default function ImageUploader({ value, onChange }) {
   const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
 
   const processFile = (file) => {
-    if (!file) return;
+    if (!file || disabled) return;
 
     // Validación de tipo
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!validTypes.includes(file.type)) {
-      toast.error('Formato no soportado. Usa JPEG, PNG o WebP.');
+      toast.error('Formato no soportado. Usa JPEG, PNG, WebP o GIF.');
       return;
     }
 
@@ -28,34 +26,7 @@ export default function ImageUploader({ value, onChange }) {
       return;
     }
 
-    setUploading(true);
-    setUploadProgress(20);
-
-    const reader = new FileReader();
-    reader.onprogress = (e) => {
-      if (e.lengthComputable) {
-        const percent = Math.round((e.loaded / e.total) * 90);
-        setUploadProgress(percent);
-      }
-    };
-
-    reader.onload = () => {
-      setUploadProgress(100);
-      setTimeout(() => {
-        onChange(reader.result);
-        setUploading(false);
-        setUploadProgress(0);
-        toast.success('Imagen cargada correctamente');
-      }, 300);
-    };
-
-    reader.onerror = () => {
-      setUploading(false);
-      setUploadProgress(0);
-      toast.error('Error al procesar el archivo.');
-    };
-
-    reader.readAsDataURL(file);
+    onFileSelect(file);
   };
 
   const handleDrop = (e) => {
@@ -76,7 +47,7 @@ export default function ImageUploader({ value, onChange }) {
     e.stopPropagation();
     onChange('');
     if (fileInputRef.current) fileInputRef.current.value = '';
-    toast.info('Imagen removida');
+    toast.info('Guarda los cambios para quitar la imagen del catálogo.');
   };
 
   const handleApplyManualUrl = () => {
@@ -98,9 +69,6 @@ export default function ImageUploader({ value, onChange }) {
                 src={value}
                 alt="Vista previa"
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
               />
             </div>
             <div className="min-w-0">
@@ -117,6 +85,7 @@ export default function ImageUploader({ value, onChange }) {
           <button
             type="button"
             onClick={handleRemove}
+            disabled={disabled}
             className="p-2.5 rounded-xl bg-rocoto/10 hover:bg-rocoto/20 border border-rocoto/20 text-rocoto transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="Quitar imagen"
           >
@@ -131,7 +100,7 @@ export default function ImageUploader({ value, onChange }) {
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !disabled && fileInputRef.current?.click()}
           className={`relative rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition-all ${
             dragOver
               ? 'border-aji bg-aji/10'
@@ -141,8 +110,9 @@ export default function ImageUploader({ value, onChange }) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             onChange={handleFileChange}
+            disabled={disabled}
             className="hidden"
           />
 
@@ -154,23 +124,8 @@ export default function ImageUploader({ value, onChange }) {
             Arrastra tu imagen aquí o <span className="text-aji underline">examina</span>
           </p>
           <p className="text-[11px] text-muted mt-1 font-sans">
-            PNG, JPG o WebP (máximo 2 MB)
+            PNG, JPG, WebP o GIF (máximo 2 MB)
           </p>
-
-          {/* Barra de progreso de subida */}
-          {uploading && (
-            <div className="mt-4 max-w-xs mx-auto">
-              <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="h-full bg-aji transition-all duration-200"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
-              <span className="text-[10px] text-muted mt-1 block">
-                Procesando imagen... {uploadProgress}%
-              </span>
-            </div>
-          )}
         </div>
       )}
 
@@ -197,6 +152,7 @@ export default function ImageUploader({ value, onChange }) {
           <button
             type="button"
             onClick={handleApplyManualUrl}
+            disabled={disabled}
             className="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-semibold text-cream transition-colors min-h-[44px]"
           >
             Aplicar

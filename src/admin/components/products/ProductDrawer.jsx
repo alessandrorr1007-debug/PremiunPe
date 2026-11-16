@@ -8,6 +8,7 @@ import {
   formatPriceNumber, 
   DELIVERY_TYPE_LABELS 
 } from '../../lib/mockData';
+import { uploadProductImage } from '../../lib/supabase';
 import ImageUploader from '../common/ImageUploader';
 import Toggle from '../common/Toggle';
 import { 
@@ -51,6 +52,8 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
   const [initialSnapshot, setInitialSnapshot] = useState('');
   const [activeSection, setActiveSection] = useState('info'); // info | delivery | includes | pricing | image | preview
   const [submitting, setSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [previewFlipped, setPreviewFlipped] = useState(false);
 
@@ -82,16 +85,30 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
       setFormData(initialForm);
       setInitialSnapshot(JSON.stringify(initialForm));
     }
+    setImageFile(null);
     setActiveSection('info');
     setShowDiscardConfirm(false);
     setPreviewFlipped(false);
   }, [productToEdit, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || !imageFile) {
+      setImagePreview('');
+      return;
+    }
+    const previewUrl = URL.createObjectURL(imageFile);
+    setImagePreview(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [isOpen, imageFile]);
+
   if (!isOpen) return null;
 
-  const isDirty = JSON.stringify(formData) !== initialSnapshot;
+  const previewImage = imagePreview || formData.image_url;
+
+  const isDirty = Boolean(imageFile) || JSON.stringify(formData) !== initialSnapshot;
 
   const handleRequestClose = () => {
+    if (submitting) return;
     if (isDirty) {
       setShowDiscardConfirm(true);
     } else {
@@ -121,6 +138,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
     if (!formData.name.trim()) {
       toast.error('El nombre del producto es obligatorio.');
@@ -153,6 +171,13 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
 
     try {
       setSubmitting(true);
+      if (imageFile) {
+        const imageUrl = await uploadProductImage(imageFile);
+        payload.image_url = imageUrl;
+        // Reuse the uploaded file if saving the product fails and is retried.
+        setFormData(current => ({ ...current, image_url: imageUrl }));
+        setImageFile(null);
+      }
       if (productToEdit) {
         await updateProduct(productToEdit.id, payload);
         toast.success(`"${formData.name}" actualizado.`);
@@ -586,14 +611,19 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
               {/* Subir Imagen */}
               <div>
                 <label className="block text-xs font-sora font-semibold text-cream mb-1.5">
-                  Imagen o Carátula (Opcional - Monograma por defecto)
+                  Imagen o Carátula (Opcional)
                 </label>
                 <ImageUploader
-                  value={formData.image_url}
-                  onChange={(url) => setFormData({ ...formData, image_url: url })}
+                  value={previewImage}
+                  onFileSelect={setImageFile}
+                  disabled={submitting}
+                  onChange={(url) => {
+                    setImageFile(null);
+                    setFormData(current => ({ ...current, image_url: url }));
+                  }}
                 />
                 <p className="text-[11px] text-muted mt-1.5">
-                  Si no subes imagen, la tienda genera automáticamente un monograma minimalista con su inicial.
+                  Guarda los cambios para publicar la imagen. Si quitas la imagen, la tienda mostrará la portada predeterminada.
                 </p>
               </div>
             </div>
@@ -630,9 +660,9 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                       <div
                         className={`w-12 h-12 rounded-2xl ${previewAccent.bg} border ${previewAccent.border} ${previewAccent.text} font-sora font-extrabold text-lg flex items-center justify-center shadow-sm`}
                       >
-                        {formData.image_url ? (
+                        {previewImage ? (
                           <img
-                            src={formData.image_url}
+                            src={previewImage}
                             alt="Preview"
                             className="w-full h-full object-cover rounded-2xl"
                           />

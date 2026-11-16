@@ -26,14 +26,15 @@ export async function uploadProductImage(file) {
     throw new Error('Supabase no está configurado aún. Configura tus credenciales en el archivo .env');
   }
 
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+  const fileExt = file.type.split('/')[1];
+  const fileName = `${crypto.randomUUID()}.${fileExt}`;
   const filePath = `products/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from('product-images')
     .upload(filePath, file, {
       cacheControl: '3600',
+      contentType: file.type,
       upsert: false,
     });
 

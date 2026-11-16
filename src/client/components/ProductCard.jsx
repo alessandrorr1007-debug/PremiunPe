@@ -11,7 +11,8 @@ export default function ProductCard({ product }) {
   const { openProductDetails, reviewProductOrder } = useStoreDialogs();
   const available = product.available !== false;
   const inCombo = combo.some(item => item.id === product.id);
-  const { brand, cover } = productCover(product.name);
+  const { brand, cover: defaultCover } = productCover(product.name);
+  const cover = product.image_url?.trim() || defaultCover;
   const CategoryIcon = categoryIcons[product.category] || LayoutGrid;
 
   return (
