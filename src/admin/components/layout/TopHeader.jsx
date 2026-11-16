@@ -13,6 +13,7 @@ export default function TopHeader({ activeTab, onOpenCreate }) {
     summary: 'Resumen General',
     products: 'Gestión de Productos',
     settings: 'Configuración de la Tienda',
+    promotions: 'Gestión de Promociones',
   };
 
   return (

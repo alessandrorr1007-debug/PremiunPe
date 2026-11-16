@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Package, CheckCircle2, AlertTriangle, Sparkles, Plus, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
+import { Package, CheckCircle2, AlertTriangle, Sparkles, Plus, Gift, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
 import StatCard from './StatCard';
 import SetupAlerts from './SetupAlerts';
 import RestockQuickList from './RestockQuickList';
@@ -8,6 +8,7 @@ export default function SummaryTab({
   products, 
   settings, 
   onOpenCreate, 
+  onOpenPromotion,
   onGoToSettings, 
   onGoToProducts, 
   onFilterNoImage,
@@ -73,23 +74,42 @@ export default function SummaryTab({
           Acciones Rápidas
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button
-            type="button"
-            onClick={onOpenCreate}
-            className="p-4 rounded-xl bg-ink/[0.03] hover:bg-ink/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-aji/15 border border-aji/30 flex items-center justify-center text-aji">
-                <Plus className="w-5 h-5" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
+          <div className="grid gap-3">
+            <button
+              type="button"
+              onClick={onOpenCreate}
+              className="p-4 rounded-xl bg-ink/[0.03] hover:bg-ink/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-aji/15 border border-aji/30 flex items-center justify-center text-aji">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-sora font-semibold text-cream">Nuevo Producto</h4>
+                  <p className="text-[11px] text-muted">Agregar servicio o plan</p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-sm font-sora font-semibold text-cream">Nuevo Producto</h4>
-                <p className="text-[11px] text-muted">Agregar servicio o plan</p>
+              <ArrowRight className="w-4 h-4 text-muted group-hover:text-cream transition-colors" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpenPromotion}
+              className="p-4 rounded-xl bg-ink/[0.03] hover:bg-ink/[0.06] border border-borderCream flex items-center justify-between text-left group transition-all min-h-[44px]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 shrink-0 rounded-xl bg-aji/15 border border-aji/30 flex items-center justify-center text-aji">
+                  <Gift className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-sora font-semibold text-cream">Nueva promoción</h4>
+                  <p className="text-[11px] text-muted">Crear o gestionar combos</p>
+                </div>
               </div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-muted group-hover:text-cream transition-colors" />
-          </button>
+              <ArrowRight className="w-4 h-4 shrink-0 text-muted group-hover:text-cream transition-colors" />
+            </button>
+          </div>
 
           <button
             type="button"

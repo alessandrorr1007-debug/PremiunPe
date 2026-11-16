@@ -25,7 +25,7 @@ export default function ClientStoreView() {
       <StoreThemeProvider>
       <MotionConfig reducedMotion="user">
       <StoreDialogsProvider>
-      <div className="store-shell min-h-screen flex flex-col bg-night text-cream selection:bg-aji selection:text-night font-inter antialiased overflow-x-hidden relative">
+      <div className="store-shell min-h-screen flex flex-col bg-night text-cream selection:bg-aji selection:text-night font-inter antialiased overflow-x-clip relative">
         {/* 1. Header fijo translúcido con botón de configuración y scroll */}
         <Navbar />
 

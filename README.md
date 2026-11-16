@@ -19,7 +19,7 @@ Abre `/login` o selecciona **Iniciar sesión** desde la tienda.
 - **Usuario:** `cheridecheros` (alias de `admin@premiumpe.com`)
 - **Contraseña:** la contraseña privada configurada en Supabase Auth. No se almacena en el repositorio.
 
-En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. En **Configuración → Promociones**, selecciona al menos dos productos, fija un precio en soles y revisa la vista previa. Guarda el combo con **Activar promoción** marcado para publicarlo durante las fechas que indiques (hora de Perú). Usa **Ver Tienda** para regresar al catálogo.
+En el panel puedes editar los productos, precios, disponibilidad y visibilidad, así como configurar el número de WhatsApp y los textos de la portada. En **Resumen → Acciones rápidas → Nueva promoción**, selecciona al menos dos productos, fija un precio en soles y revisa la vista previa. Guarda el combo con **Activar promoción** marcado para publicarlo durante las fechas que indiques (hora de Perú). Usa **Ver Tienda** para regresar al catálogo.
 
 ## Desarrollo local
 

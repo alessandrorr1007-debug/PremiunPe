@@ -45,6 +45,53 @@ async function mockAdminAuth(page) {
   };
 }
 
+test.describe('Nuevo Producto en celular', () => {
+  test.use({ viewport: devices['iPhone 13'].viewport, isMobile: true, hasTouch: true });
+
+  test('permite cancelar, conservar cambios y publicar en el catálogo', async ({ page }) => {
+    const state = await mockStore(page);
+    const login = await mockAdminAuth(page);
+    await page.route('https://premiumpe-qa.invalid/rest/v1/products**', route => {
+      if (route.request().method() !== 'POST') return route.fallback();
+      const item = { ...route.request().postDataJSON()[0], id: 'qa-mobile' };
+      state.products.push(item);
+      return route.fulfill({ status: 201, json: [item], headers: { 'access-control-allow-origin': '*' } });
+    });
+    await login();
+    await page.evaluate(() => {
+      const badge = document.createElement('iframe');
+      badge.id = 'nl-badge-frame';
+      badge.style.cssText = 'position:fixed;right:0;bottom:0;width:197px;height:64px;z-index:2147483645';
+      document.body.append(badge);
+    });
+
+    const open = page.getByRole('button', { name: 'Crear Nuevo Producto' });
+    const form = page.getByRole('dialog', { name: 'Nuevo Producto' });
+    const name = form.getByPlaceholder('ej. Disney+ Premium');
+    const discard = page.getByRole('alertdialog');
+    await open.tap();
+    await name.fill('Borrador');
+    await form.getByRole('button', { name: 'Cancelar' }).tap();
+    await discard.getByRole('button', { name: 'Continuar editando' }).tap();
+    await expect(name).toHaveValue('Borrador');
+    await form.getByRole('button', { name: 'Cerrar panel' }).tap();
+    await discard.getByRole('button', { name: 'Descartar cambios' }).tap();
+    await expect(form).toBeHidden();
+
+    await open.tap();
+    await expect(name).toBeEmpty();
+    await name.fill('Servicio móvil QA');
+    const create = form.getByRole('button', { name: 'Crear Producto', exact: true });
+    await create.tap();
+    await form.getByPlaceholder('12.00').fill('19.75');
+    await create.tap();
+    await expect(form).toBeHidden();
+    expect(state.products.find(item => item.id === 'qa-mobile')).toMatchObject({ visible: true, price: 19.75 });
+    await page.goto('/#catalogo');
+    await expect(page.getByRole('heading', { name: 'Servicio móvil QA' })).toBeVisible();
+  });
+});
+
 test('sesión administrativa verificada, CRUD aislado y cierre de sesión', async ({ page, browser }) => {
   const state = await mockStore(page);
   const login = await mockAdminAuth(page);
@@ -202,7 +249,7 @@ test('sesión administrativa verificada, CRUD aislado y cierre de sesión', asyn
   await expect(page.getByRole('heading', { name: 'Disney+ editado en QA', exact: true })).toHaveCount(0);
 });
 
-test('Configuración permite editar, previsualizar, activar, pausar y eliminar una promoción', async ({ page }) => {
+test('Acciones rápidas permite crear, previsualizar, activar, pausar y eliminar una promoción', async ({ page }) => {
   await mockStore(page);
   const login = await mockAdminAuth(page);
   const headers = { 'access-control-allow-origin': '*' };
@@ -224,7 +271,9 @@ test('Configuración permite editar, previsualizar, activar, pausar y eliminar u
   await login();
   await page.getByRole('button', { name: /^(Configuración|Ajustes)/ }).filter({ visible: true }).click();
   const section = page.getByRole('region', { name: 'Promociones' });
-  await section.getByRole('button', { name: 'Nueva promoción' }).click();
+  await expect(section).toHaveCount(0);
+  await page.getByRole('button', { name: /^Resumen/ }).filter({ visible: true }).click();
+  await page.getByRole('button', { name: /^Nueva promoción/ }).click();
   await section.getByLabel('Nombre del combo').fill('Oferta QA');
   await section.getByLabel('Precio promocional (PEN)').fill('15.50');
   await section.getByLabel('Descripción (opcional)').fill('Incluye dos servicios.');

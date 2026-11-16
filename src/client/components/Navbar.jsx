@@ -55,7 +55,7 @@ export default function Navbar() {
       </div>
 
       {/* Header Fijo Translúcido */}
-      <header ref={headerRef} className="market-header fixed top-0 inset-x-0 h-20 bg-canvas/80 backdrop-blur-xl border-b border-borderCream z-40">
+      <header ref={headerRef} className="market-header fixed top-0 inset-x-0 h-20 bg-canvas/80 backdrop-blur-xl border-b border-borderCream z-[45]">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo PremiumPe */}
@@ -169,11 +169,11 @@ export default function Navbar() {
         {/* Menú Desplegable Móvil */}
         <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div id="store-mobile-menu" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden xl:hidden bg-night/95 backdrop-blur-2xl border-b border-borderCream px-4 py-5 space-y-3">
+          <motion.div id="store-mobile-menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, pointerEvents: 'none' }} transition={{ duration: 0.2 }} className="max-h-[calc(100dvh-4rem)] md:max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain xl:hidden bg-night/95 backdrop-blur-2xl border-b border-borderCream px-4 py-5">
             <nav className="flex flex-col space-y-1 text-sm font-medium text-muted">
               <a
                 href="#catalogo"
-              aria-current={activeSection === 'catalogo' ? 'location' : undefined}
+                aria-current={activeSection === 'catalogo' ? 'location' : undefined}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-3 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
               >
@@ -181,7 +181,7 @@ export default function Navbar() {
               </a>
               <a
                 href="#como-comprar"
-              aria-current={activeSection === 'como-comprar' ? 'location' : undefined}
+                aria-current={activeSection === 'como-comprar' ? 'location' : undefined}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-3 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
               >
@@ -189,7 +189,7 @@ export default function Navbar() {
               </a>
               <a
                 href="#por-que-nosotros"
-              aria-current={activeSection === 'por-que-nosotros' ? 'location' : undefined}
+                aria-current={activeSection === 'por-que-nosotros' ? 'location' : undefined}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-3 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
               >
@@ -197,7 +197,7 @@ export default function Navbar() {
               </a>
               <a
                 href="#preguntas"
-              aria-current={activeSection === 'preguntas' ? 'location' : undefined}
+                aria-current={activeSection === 'preguntas' ? 'location' : undefined}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-3 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
               >

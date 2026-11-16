@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { useAdminStore } from '../../context/AdminStoreContext';
 import { 
   PRODUCT_CATEGORIES, 
@@ -27,6 +27,7 @@ import { toast } from 'sonner';
 
 export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
   const { addProduct, updateProduct, settings } = useAdminStore();
+  const formId = useId();
   const currency = settings?.currency || 'S/';
 
   const initialForm = {
@@ -146,9 +147,9 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
       return;
     }
 
-    const priceNum = parseFloat(formData.price);
-    if (isNaN(priceNum) || priceNum < 0) {
-      toast.error('Ingresa un precio válido (mayor o igual a 0).');
+    const priceNum = Number(formData.price);
+    if (!formData.price.trim() || !Number.isFinite(priceNum) || priceNum < 0 || priceNum > 99999999.99) {
+      toast.error('Ingresa un precio válido entre 0 y 99 999 999,99.');
       setActiveSection('pricing');
       return;
     }
@@ -236,15 +237,15 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
       <div className="absolute inset-0" onClick={handleRequestClose} />
 
       {/* Drawer deslizante (pantalla completa en celular, max-w-2xl en desktop) */}
-      <div className="relative w-full max-w-2xl h-full bg-cardBg border-l border-borderCream shadow-2xl flex flex-col z-10 animate-slideInRight text-cream">
+      <div role="dialog" aria-modal="true" aria-labelledby={`${formId}-title`} className="relative w-full max-w-2xl h-full max-h-[100dvh] bg-cardBg border-l border-borderCream shadow-2xl flex flex-col z-10 animate-slideInRight text-cream">
         {/* Cabecera */}
-        <div className="p-4 sm:p-5 border-b border-borderCream flex items-center justify-between bg-night/90">
+        <div className="shrink-0 p-4 sm:p-5 border-b border-borderCream flex items-center justify-between bg-night/90">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-aji/15 border border-aji/30 flex items-center justify-center font-sora font-extrabold text-aji text-sm">
               {productToEdit ? '✎' : '+'}
             </div>
             <div>
-              <h3 className="text-base font-sora font-bold text-cream tracking-tight">
+              <h3 id={`${formId}-title`} className="text-base font-sora font-bold text-cream tracking-tight">
                 {productToEdit ? 'Editar Producto' : 'Nuevo Producto'}
               </h3>
               <p className="text-[11px] text-muted">
@@ -254,7 +255,9 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
           </div>
 
           <button
+            type="button"
             onClick={handleRequestClose}
+            disabled={submitting}
             className="w-9 h-9 rounded-xl text-muted hover:text-cream hover:bg-ink/[0.06] transition-colors flex items-center justify-center"
             aria-label="Cerrar panel"
           >
@@ -263,7 +266,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
         </div>
 
         {/* Pestañas de Navegación Rápida interna */}
-        <div className="flex border-b border-borderCream bg-night/40 px-3 sm:px-4 text-xs font-sora overflow-x-auto scrollbar-none">
+        <div className="flex shrink-0 border-b border-borderCream bg-night/40 px-3 sm:px-4 text-xs font-sora overflow-x-auto scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveSection('info')}
@@ -311,7 +314,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
         </div>
 
         {/* Formulario con Scroll */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <form id={formId} noValidate onSubmit={handleSubmit} className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-6">
           {/* SECCIÓN 1: INFORMACIÓN */}
           {activeSection === 'info' && (
             <div className="space-y-4 animate-fadeIn">
@@ -504,7 +507,7 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
                   </span>
                   <input
                     type="number"
-                    step="0.5"
+                    step="0.01"
                     min="0"
                     required
                     value={formData.price}
@@ -770,18 +773,19 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
         </form>
 
         {/* Pie de acciones de guardado */}
-        <div className="p-4 border-t border-borderCream bg-night flex items-center justify-between gap-3">
+        <div className="admin-product-actions shrink-0 p-4 border-t border-borderCream bg-night flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={handleRequestClose}
+            disabled={submitting}
             className="px-4 py-2.5 rounded-xl bg-ink/[0.04] hover:bg-ink/[0.08] text-muted hover:text-cream text-xs font-sora font-semibold transition-colors min-h-[44px]"
           >
             Cancelar
           </button>
 
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
+            form={formId}
             disabled={submitting}
             className="px-6 py-2.5 rounded-xl admin-button-primary text-xs font-sora font-bold shadow-md flex items-center gap-2 disabled:opacity-50 min-h-[44px]"
           >
@@ -802,11 +806,11 @@ export default function ProductDrawer({ isOpen, onClose, productToEdit }) {
 
       {/* Diálogo de advertencia si intenta cerrar con cambios sin guardar */}
       {showDiscardConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-ink/35 backdrop-blur-sm animate-fadeIn">
+        <div role="alertdialog" aria-modal="true" aria-labelledby={`${formId}-discard-title`} className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-ink/35 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-sm rounded-[24px] bg-cardBg border border-aji/40 p-5 shadow-2xl text-left space-y-4">
             <div className="flex items-center gap-2.5 text-aji">
               <ShieldAlert className="w-5 h-5" />
-              <h4 className="font-sora font-bold text-sm text-cream">¿Descartar cambios?</h4>
+              <h4 id={`${formId}-discard-title`} className="font-sora font-bold text-sm text-cream">¿Descartar cambios?</h4>
             </div>
             <p className="text-xs text-muted leading-relaxed">
               Tienes modificaciones sin guardar en este producto. Si sales ahora, se perderán los cambios realizados.

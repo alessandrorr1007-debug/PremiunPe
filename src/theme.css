@@ -23,3 +23,10 @@ html[data-store-theme="light"],
   --store-strong: 142 111 98;
   --store-secondary: var(--store-muted);
 }
+.admin-product-actions {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+body:has(#nl-badge-frame) .admin-product-actions {
+  padding-bottom: max(5rem, calc(1rem + env(safe-area-inset-bottom)));
+}

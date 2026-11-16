@@ -41,7 +41,7 @@ export default function PromotionsSettings() {
   const [offers, setOffers] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState(blank);
   const [preview, setPreview] = useState(false);
   const [removeId, setRemoveId] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -145,8 +145,8 @@ export default function PromotionsSettings() {
         <h3 id="admin-promotions" className="font-sora font-bold text-base text-cream inline-flex items-center gap-2">
           <Gift size={18} className="text-aji" aria-hidden="true" /> Promociones
         </h3>
-        <button type="button" className={primary + ' inline-flex items-center gap-2'} disabled={!loaded || loadError || busy}
-          onClick={() => startEditing(null)}><Plus size={16} aria-hidden="true" /> Nueva promoción</button>
+        {!form && <button type="button" className={primary + ' inline-flex items-center gap-2'} disabled={!loaded || loadError || busy}
+          onClick={() => startEditing(null)}><Plus size={16} aria-hidden="true" /> Nueva promoción</button>}
       </div>
       {!loaded && <p role="status" className="text-muted">Cargando promociones…</p>}
       {loadError && <p role="alert" className="text-muted">No se pudieron cargar las promociones. <button type="button" className={button} onClick={load}>Reintentar</button></p>}
@@ -175,7 +175,7 @@ export default function PromotionsSettings() {
           ))}
         </ul>
       )}
-      {form && (
+      {loaded && !loadError && form && (
         <form onSubmit={save} aria-labelledby="promotion-editor" className="border-t border-borderCream pt-4">
           <fieldset disabled={busy} className="space-y-4 min-w-0">
             <legend id="promotion-editor" className="font-sora font-semibold text-cream mb-3">{form.id ? 'Editar promoción' : 'Crear promoción'}</legend>

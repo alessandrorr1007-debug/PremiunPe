@@ -5,6 +5,7 @@ import AdminLayout from '../components/AdminLayout';
 import SummaryTab from '../components/dashboard/SummaryTab';
 import ProductsTab from '../components/products/ProductsTab';
 import SettingsTab from '../components/SettingsTab';
+import PromotionsSettings from '../components/PromotionsSettings';
 import ProductDrawer from '../components/products/ProductDrawer';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import { AdminStoreProvider, useAdminStore } from '../context/AdminStoreContext';
@@ -32,7 +33,7 @@ function DashboardContent() {
     bulkDelete
   } = useAdminStore();
 
-  const [activeTab, setActiveTab] = useState('summary'); // summary | products | settings
+  const [activeTab, setActiveTab] = useState('summary');
 
   // Estado del drawer de producto (Crear / Editar)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -90,6 +91,10 @@ function DashboardContent() {
           products={products}
           settings={settings}
           onOpenCreate={handleOpenCreate}
+          onOpenPromotion={() => {
+            setActiveTab('promotions');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
           onGoToSettings={() => setActiveTab('settings')}
           onGoToProducts={() => setActiveTab('products')}
           onFilterNoImage={() => setActiveTab('products')}
@@ -120,6 +125,8 @@ function DashboardContent() {
 
       {/* 3. VISTA DE CONFIGURACIÓN */}
       {activeTab === 'settings' && <SettingsTab />}
+
+      {activeTab === 'promotions' && <PromotionsSettings />}
 
       {/* DRAWER LATERAL: CREAR / EDITAR PRODUCTO */}
       <ProductDrawer
