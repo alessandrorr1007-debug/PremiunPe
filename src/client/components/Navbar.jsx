@@ -210,7 +210,7 @@ export default function Navbar() {
                 Preguntas
               </a>
               <a
-                href="https://devcodepee.netlify.app/"
+                href="https://devcodepe.netlify.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
