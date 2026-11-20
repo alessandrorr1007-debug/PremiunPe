@@ -16,7 +16,7 @@ export function StoreCurrencyProvider({ children }) {
         const response = await fetch('/.netlify/functions/store-currency', {
           signal: controller.signal
         });
-        if (!response.ok) return;
+        if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) return;
         const data = await response.json();
         if (data.currency !== 'PEN' && /^[A-Z]{3}$/.test(data.currency) && /^[A-Z]{2}$/.test(data.country) &&
           Number.isFinite(data.rate) && data.rate > 0 && !controller.signal.aborted) {

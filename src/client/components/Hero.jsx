@@ -16,7 +16,7 @@ export default function Hero() {
         <p>{subtitle && subtitle !== 'Elige, combina y pide por WhatsApp en minutos.' ? subtitle : 'Membresías digitales premium al mejor precio en Perú.'}</p>
         <div className="market-payment"><Smartphone size={20} aria-hidden="true" /><span><strong>{settings?.payment_methods || 'Yape y Plin'}</strong> como medios de pago.</span></div>
       </div>
-      <img className="market-hero-art" src={heroArt} alt="" fetchPriority="high" width="1000" height="550" />
+      <img className="market-hero-art" src={heroArt} alt="" fetchpriority="high" width="1000" height="550" />
     </section>
   );
 }

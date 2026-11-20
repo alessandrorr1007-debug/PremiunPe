@@ -95,14 +95,6 @@ export default function Navbar() {
             >
               Preguntas
             </a>
-            <a
-              href="https://devcodepe.netlify.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
-            >
-              Soluciones Digitales
-            </a>
           </nav>
 
           {/* Buscador, Configuración & WhatsApp */}
@@ -208,15 +200,6 @@ export default function Navbar() {
                 className="px-4 py-3 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
               >
                 Preguntas
-              </a>
-              <a
-                href="https://devcodepe.netlify.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 rounded-xl hover:text-cream hover:bg-ink/5 transition-all"
-              >
-                Soluciones Digitales
               </a>
 
               {/* Opción de Configuración en Móvil */}
